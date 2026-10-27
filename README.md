@@ -5,3 +5,5 @@ Versión pública y de solo lectura del Radar Tecnopolítico: tecnopolítica, in
 - `index.html`: la página (lista, mapa y galaxia).
 - `data/`: los reportes del monitoreo. Se actualizan solos a medida que aparecen novedades; el historial nunca se borra.
 - `tools/exportar.py`: une los reportes nuevos con los ya publicados.
+
+Página pública: https://lucyperezperiodista-lang.github.io/Radar/
