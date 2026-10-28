@@ -16,6 +16,12 @@ if True:
     for f in lay:
         d = json.load(open(f)); d["id"] = os.path.basename(f)[:-5]; L.append(d)
     json.dump(L, open(os.path.join(data, "layers.json"), "w"), ensure_ascii=False)
+# cambios de propiedad (cables y medios): se unen, nunca se borran
+pp = os.path.join(data, "propiedad.json")
+prevp = {r["id"]: r for r in json.load(open(pp))} if os.path.exists(pp) else {}
+for f in glob.glob(os.path.join(src, "propiedad", "*.json")):
+    d = json.load(open(f)); d["id"] = os.path.basename(f)[:-5]; prevp[d["id"]] = d
+json.dump(sorted(prevp.values(), key=lambda r: str(r.get("at", ""))), open(pp, "w"), ensure_ascii=False)
 for name, rel in [("search.json", "settings/search.json"), ("lastRun.json", "status/lastRun.json"), ("general.json", "settings/general.json")]:
     p = os.path.join(src, rel)
     if os.path.exists(p): json.dump(json.load(open(p)), open(os.path.join(data, name), "w"), ensure_ascii=False)
