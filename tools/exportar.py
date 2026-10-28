@@ -10,6 +10,12 @@ for f in glob.glob(os.path.join(src, "reports", "*.json")):
     d = json.load(open(f)); d["id"] = os.path.basename(f)[:-5]; prev[d["id"]] = d
 reps = sorted(prev.values(), key=lambda r: r.get("generatedAt", ""), reverse=True)
 json.dump(reps, open(path, "w"), ensure_ascii=False)
+lay = sorted(glob.glob(os.path.join(src, "layers", "*.json")))
+if True:
+    L = []
+    for f in lay:
+        d = json.load(open(f)); d["id"] = os.path.basename(f)[:-5]; L.append(d)
+    json.dump(L, open(os.path.join(data, "layers.json"), "w"), ensure_ascii=False)
 for name, rel in [("search.json", "settings/search.json"), ("lastRun.json", "status/lastRun.json"), ("general.json", "settings/general.json")]:
     p = os.path.join(src, rel)
     if os.path.exists(p): json.dump(json.load(open(p)), open(os.path.join(data, name), "w"), ensure_ascii=False)
