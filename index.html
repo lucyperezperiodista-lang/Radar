@@ -447,6 +447,7 @@ body.fs-open{overflow:hidden}
 .seg2{display:inline-flex;flex-wrap:wrap;border:1px solid var(--line);border-radius:8px;overflow:hidden}
 .seg2 button{border:0;background:none;color:var(--muted);padding:6px 10px;font-size:12.5px;cursor:pointer}
 .seg2 button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+.ikinds{margin:0 0 12px}.seg2 button:disabled{opacity:.38;cursor:not-allowed}.ikhint{margin:2px 0 6px;font-size:12.5px;color:var(--muted)}
 .iwrap{background:var(--sunk);border-radius:10px;padding:12px;display:grid;place-items:center}
 .iwrap canvas{max-width:100%;max-height:72vh;height:auto;border-radius:6px;box-shadow:0 6px 24px rgba(0,0,0,.25)}
 
@@ -1094,7 +1095,14 @@ function setLive(state){
   else{el.className="pill";el.textContent="Sin conexión";el.title="Recarga la página"}
 }
 function refreshTimes(){try{if(current&&reports.length)renderLede()}catch(e){}try{renderSearch()}catch(e){}if(lastSync)setLive("ok")}
-function applyReports(list){
+/* Informes publicados como archivos del artefacto (data/reports.json): el monitoreo los publica ahí y en GitHub. Se suman a los de la base. */
+let dbRepList=[],fileRepList=[],fileRepSig="";
+function mergeReps(){const m=new Map();fileRepList.forEach(r=>r&&r.id&&m.set(r.id,r));dbRepList.forEach(r=>r&&r.id&&m.set(r.id,r));const cut=cutoffDate();
+  return [...m.values()].filter(r=>!r.date||r.date>=cut).sort((a,b)=>String(b.generatedAt||"").localeCompare(String(a.generatedAt||""))).slice(0,500)}
+function loadFileReps(){if(PUB)return;fetch("data/reports.json?t="+Date.now(),{cache:"no-store"}).then(r=>r.ok?r.text():null).then(t=>{if(!t||t===fileRepSig)return;fileRepSig=t;try{fileRepList=JSON.parse(t)||[]}catch(_){return}applyReports(dbRepList,true)}).catch(()=>{});
+  fetch("data/propiedad.json?t="+Date.now(),{cache:"no-store"}).then(r=>r.ok?r.json():null).then(d=>{if(Array.isArray(d)){filePropL=d;setProp()}}).catch(()=>{});
+  fetch("data/lastRun.json?t="+Date.now(),{cache:"no-store"}).then(r=>r.ok?r.json():null).then(d=>{if(d&&(!lastRun||String(d.at||d.finishedAt||"")>String(lastRun.at||lastRun.finishedAt||""))){lastRun=d;try{renderSearch()}catch(_){}}}).catch(()=>{})}
+function applyReports(list,fromFiles){if(!PUB){if(!fromFiles)dbRepList=list||[];list=mergeReps()}
   lastSync=new Date();retryMs=5000;setLive("ok");
   const sig=sigOf(list);
   if(sig===lastSig){refreshTimes();return}
@@ -1228,7 +1236,8 @@ function applyProp(list){const R=window.__RESEARCH__;if(!R)return;
       Object.assign(o,c);if(src.url){o.url=src.url;o.src=src.titulo||src.url}if(d.fecha)o.asof=d.fecha;(o.hist=o.hist||[]).push(Object.assign({de:prev,a:o.t},stamp))}
   }catch(_){}});
   R.changes=list.slice().sort((a,b)=>String(b.at||b.fecha||"").localeCompare(String(a.at||a.fecha||"")));depCache=null}
-function subscribeProp(db){try{db.collection("propiedad").onSnapshot(s=>{const L=s.docs.map(d=>Object.assign({id:d.id},d.data()));const sig=JSON.stringify(L.map(x=>[x.id,x.at]));if(sig===propSig)return;propSig=sig;propDocs=L;applyProp(L);if(view==="inv"||view==="mapa")renderViz()},()=>{})}catch(_){}}
+let dbPropL=[],filePropL=[];function setProp(){const m=new Map();filePropL.forEach(x=>x&&x.id&&m.set(x.id,x));dbPropL.forEach(x=>x&&x.id&&m.set(x.id,x));const L=[...m.values()];const sig=JSON.stringify(L.map(x=>[x.id,x.at]));if(sig===propSig)return;propSig=sig;propDocs=L;applyProp(L);if(view==="inv"||view==="mapa")renderViz()}
+function subscribeProp(db){try{db.collection("propiedad").onSnapshot(s=>{dbPropL=s.docs.map(d=>Object.assign({id:d.id},d.data()));if(!PUB){setProp();return}const L=dbPropL;const sig=JSON.stringify(L.map(x=>[x.id,x.at]));if(sig===propSig)return;propSig=sig;propDocs=L;applyProp(L);if(view==="inv"||view==="mapa")renderViz()},()=>{})}catch(_){}}
 function changesHTML(kind){const R=window.__RESEARCH__||{};const L=(R.changes||[]).filter(d=>kind==="cables"?(d.tipo==="cable"||d.tipo==="cable_owner"):kind==="minas"?d.tipo==="mina":d.tipo==="medio");
   const H=kind==="cables"?(R.cableHist||[]):[];
   if(!L.length&&!H.length)return "";
@@ -1766,12 +1775,12 @@ function infoHint(){return '<p class="note">Acompáñalo con la <button class="l
 
 const IFMT=[["45","Feed 4:5 · Instagram y Facebook",1080,1350],["11","Cuadrado 1:1",1080,1080],["169","Horizontal 16:9 · X y LinkedIn",1600,900],["916","Historia 9:16",1080,1920]];
 let infoFmt=store.get("radar-ifmt")||"45", infoTheme=store.get("radar-itheme")||"dark";
-function infoCtl(){return '<h4>Infografía del tema</h4><div class="ictl"><div class="seg2" role="group" aria-label="Formato">'+IFMT.map(f=>'<button data-ifmt="'+f[0]+'" aria-pressed="'+(infoFmt===f[0])+'">'+esc(f[1])+"</button>").join("")+'</div></div>'}
+function infoCtl(){return '<h4>Infografía del tema</h4><div class="ictl"><div class="seg2" role="group" aria-label="Formato">'+IFMT.map(f=>'<button data-ifmt="'+f[0]+'" aria-pressed="'+(infoFmt===f[0])+'">'+esc(f[1])+"</button>").join("")+'</div></div>'+ikindCtl(currentTopic())}
 function infoPane(t){
   return '<h4>Infografía del tema</h4><div class="ictl"><div class="seg2" role="group" aria-label="Formato">'+IFMT.map(f=>'<button data-ifmt="'+f[0]+'" aria-pressed="'+(infoFmt===f[0])+'">'+esc(f[1])+"</button>").join("")+'</div>'+
-    '<div class="seg2" role="group" aria-label="Tema de color"><button data-itheme="dark" aria-pressed="'+(infoTheme==="dark")+'">Oscuro</button><button data-itheme="light" aria-pressed="'+(infoTheme==="light")+'">Claro</button></div></div>'+
+    '<div class="seg2" role="group" aria-label="Tema de color"><button data-itheme="dark" aria-pressed="'+(infoTheme==="dark")+'">Oscuro</button><button data-itheme="light" aria-pressed="'+(infoTheme==="light")+'">Claro</button></div></div>'+'<p class="ikhint">Tipo de infografía: escoge qué datos de la noticia quieres contar.</p>'+ikindCtl(t)+
     '<div class="iwrap"><canvas id="infocv" role="img" aria-label="Infografía: '+esc(t.title)+'"></canvas></div>'+
-    '<div class="desk-actions"><button class="btn primary" data-idl>Descargar PNG</button>'+(PUB?'':'<button class="btn" data-ededit>✎ Editar el diseño</button>')+'<span class="note">'+(edMem["info/"+gk(t)+"/"+infoFmt]?"Diseño editado por ti. Revisa que cada dato siga siendo fiel a la ficha.":"Datos tomados de la ficha verificada, con sus fuentes al pie.")+'</span></div>'}
+    '<div class="desk-actions"><button class="btn primary" data-idl>Descargar PNG</button>'+(PUB?'':'<button class="btn" data-ededit>✎ Editar el diseño</button>')+'<span class="note">'+(edMem[ikey(t)]?"Diseño editado por ti. Revisa que cada dato siga siendo fiel a la ficha.":"Datos tomados de la ficha verificada, con sus fuentes al pie.")+'</span></div>'}
 function wrapLines(ctx,text,maxW){const words=String(text||"").split(/\s+/);const out=[];let cur="";words.forEach(w=>{const t=cur?cur+" "+w:w;if(ctx.measureText(t).width>maxW&&cur){out.push(cur);cur=w}else cur=t});if(cur)out.push(cur);return out}
 function findStat(t){const ig=t.infographic&&t.infographic.stat;if(ig&&ig.value)return {value:String(ig.value),label:ig.label||"",src:ig.src};
   const MON=/^\s*(de\s+)?(ene|feb|mar|abr|may|jun|jul|ago|sep|oct|nov|dic|enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)\b/i;
@@ -1782,7 +1791,7 @@ function findStat(t){const ig=t.infographic&&t.infographic.stat;if(ig&&ig.value)
       if(m[1]||m[3]||num>=100||/^\s*(personas|periodistas|casos|videos|cuentas|países|municipios|usuarios|millones)/i.test(after)){
         let v=(m[1]||"")+m[2]+(m[3]?(m[3]==="por ciento"?"%":(m[3]==="%"?"%":" "+m[3])):"");return {value:v.trim(),label:s,src:f.src}}}}
   return null}
-async function drawInfo(t){const cv=$("#infocv");if(!cv)return;const sd=await edGet("info/"+gk(t)+"/"+infoFmt);if(sd){await drawDoc(cv,sd);return}const SP=infoSpec(t);const F=IFMT.find(f=>f[0]===infoFmt)||IFMT[0];const W=F[2],H=F[3];cv.width=W;cv.height=H;
+async function drawInfo(t){const cv=$("#infocv");if(!cv)return;const sd=await edGet(ikey(t));if(sd){await drawDoc(cv,sd);return}if(effKind(t)!=="datos"){await drawDoc(cv,infoKindTemplate(t,infoFmt,effKind(t)));return}const SP=infoSpec(t);const F=IFMT.find(f=>f[0]===infoFmt)||IFMT[0];const W=F[2],H=F[3];cv.width=W;cv.height=H;
   try{await document.fonts.ready}catch(_){}
   const ctx=cv.getContext("2d");ctx.textBaseline="top";const D=infoTheme==="dark";
   const C=Object.assign(D?{bg:"#0D121C",bg2:"#151C2A",fg:"#E6EAF2",mu:"#98A3B7",ac:"#8C9CFF",ht:"#FF7A5C",ln:"#2A3448",ok:"#4FD1A5"}:{bg:"#F6F7FA",bg2:"#FFFFFF",fg:"#111827",mu:"#566275",ac:"#2B44D6",ht:"#D9482B",ln:"#D3DAE4",ok:"#11795B"},safeColors(SP.colors));
@@ -1836,14 +1845,14 @@ async function drawInfo(t){const cv=$("#infocv");if(!cv)return;const sd=await ed
     ctx.fillStyle=C.fg;ctx.font="400 "+px(21)+"px "+BODY;let cl=wrapLines(ctx,chk,rw-px(44));const cmx=W===H?3:2;if(cl.length>cmx){cl=cl.slice(0,cmx);cl[cmx-1]=cl[cmx-1].replace(/\s*\S*$/,"")+"…"}cl.forEach((l,j)=>ctx.fillText(l,rx+px(22),by+px(46+j*27)))}
 }
 function roundRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
-async function downloadInfo(t){const cv=$("#infocv");if(!cv)return;const name="radar-"+slug(t._oid||t.id)+"-"+infoFmt+".png";
+async function downloadInfo(t){const cv=$("#infocv");if(!cv)return;const name="radar-"+slug(t._oid||t.id)+"-"+infoFmt+(effKind(t)==="datos"?"":"-"+effKind(t))+".png";
   const blob=await new Promise(r=>cv.toBlob(r,"image/png"));if(!blob){toast("No se pudo generar la imagen.");return}
   let dl=null;try{dl=await claude.use("downloads")}catch(_){dl=null}
   if(dl){try{await dl.save({filename:name,data:blob});return}catch(err){if(err&&err.code==="declined")return;if(err&&err.code!=="unavailable"&&err.code!=="not_granted"){toast("No se pudo descargar.");return}}}
   const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500)}
 document.addEventListener("click",e=>{
   const f=e.target.closest("[data-ifmt]");if(f){infoFmt=f.dataset.ifmt;store.set("radar-ifmt",infoFmt);if(ED&&ED.kind==="info"){ED=null;edStart("info");return}renderDesk();return}
-  const th=e.target.closest("[data-itheme]");if(th){infoTheme=th.dataset.itheme;store.set("radar-itheme",infoTheme);renderDesk();return}
+  const ik=e.target.closest("[data-ikind]");if(ik&&!ik.disabled){infoKind=ik.dataset.ikind;store.set("radar-ikind",infoKind);if(ED&&ED.kind==="info"){ED=null;edStart("info");return}renderDesk();return}const th=e.target.closest("[data-itheme]");if(th){infoTheme=th.dataset.itheme;store.set("radar-itheme",infoTheme);renderDesk();return}
   if(e.target.closest("[data-idl]")){const t=currentTopic();if(t)downloadInfo(t)}
 });
 
@@ -2130,6 +2139,86 @@ function infoTemplate(t,fid){const F=IFMT.find(f=>f[0]===fid)||IFMT[0];const W=F
     add({type:"text",name:"Rótulo «antes de compartir»",text:"Antes de compartir",upper:true,font:"mono",weight:500,size:px(18),color:"ok",x:rx+px(22),y:by+px(16),w:rw-px(44),h:px(24)});
     add({type:"text",name:"Consejo",text:chk,size:px(21),lh:1.3,color:"fg",x:rx+px(22),y:by+px(46),w:rw-px(44),h:cbh-px(54)})}
   return {v:1,W,H,pal:D?"noche":"papel",colors:{},bg:"bg",layers:L}}
+/* ---------- tipos de infografía por tema ---------- */
+const IKINDS=[["datos","Datos clave"],["cifra","Cifra protagonista"],["explica","Qué pasó y por qué importa"],["voces","Quién dice qué"],["crono","Cronología"],["verifica","Cómo verificar"],["postura","Nuestra postura"]];
+const IKMES={ene:1,enero:1,feb:2,febrero:2,mar:3,marzo:3,abr:4,abril:4,may:5,mayo:5,jun:6,junio:6,jul:7,julio:7,ago:8,agosto:8,sep:9,sept:9,septiembre:9,setiembre:9,oct:10,octubre:10,nov:11,noviembre:11,dic:12,diciembre:12};
+const IKMC=["","ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+function cronoItems(t){const RE=/\b(\d{1,2})\s+(?:de\s+)?(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre|ene|feb|mar|abr|may|jun|jul|ago|sept|sep|oct|nov|dic)\.?(?:\s+(?:de\s+|del\s+)?(\d{4}))?(?![a-záéíóúñ])/i;
+  const ry=+(String(t._rdate||"").slice(0,4))||new Date().getFullYear();const out=[],seen=new Set();
+  const pool=(t.facts||[]).map(f=>String(f.text||"")).concat([t.whatHappened,t.context].join(" ").split(/(?<=[.;])\s+(?=[A-ZÁÉÍÓÚÑ¿¡«])/));const dates=new Set();for(const s of pool){const m=RE.exec(s);if(!m)continue;const d=+m[1],mo=IKMES[m[2].toLowerCase()],y=m[3]?+m[3]:null;if(!mo||d<1||d>31)continue;
+    const k=s.slice(0,60),dk=d+"/"+mo+"/"+(y||ry);if(seen.has(k)||dates.has(dk))continue;seen.add(k);dates.add(dk);out.push({d,mo,y,yy:y||ry,label:d+" "+IKMC[mo]+(y&&y!==ry?" "+y:""),text:s})}
+  return out.sort((a,b)=>a.yy-b.yy||a.mo-b.mo||a.d-b.d).slice(0,5)}
+function ikOK(t,k){if(!t)return false;switch(k){case "datos":return true;case "cifra":return !!findStat(t);case "explica":return !!(t.whatHappened||t.whyItMatters);
+  case "voces":return (t.perspectives||[]).filter(p=>p&&p.view).length>=2;case "crono":return cronoItems(t).length>=3;case "verifica":return ((t.ami&&t.ami.check)||[]).length>=2;case "postura":return !!t.stance}return false}
+let infoKind=store.get("radar-ikind")||"datos";
+const effKind=t=>ikOK(t,infoKind)?infoKind:"datos";
+const ikey=t=>{const k=effKind(t);return "info/"+gk(t)+"/"+infoFmt+(k==="datos"?"":"/"+k)};
+function ikCut(s,n){s=String(s||"").trim();if(s.length<=n)return s;const c=s.slice(0,n);const p=Math.max(c.lastIndexOf(". "),c.lastIndexOf("; "));if(p>n*0.55)return c.slice(0,p+1);return c.replace(/[\s,;:]+\S*$/,"")+"…"}
+function ikFrame(t,fid,kind){const F=IFMT.find(f=>f[0]===fid)||IFMT[0];const W=F[2],H=F[3];const wide=W>=H,S=Math.min(W/1080,H/1000),px=n=>Math.round(n*S),pad=Math.round((wide?64:80)*S);
+  const D=infoTheme==="dark";const L=[];const add=o=>{o.id=eid();L.push(o);return o};
+  add({type:"glow",x:W*0.85-Math.max(W,H)*0.8,y:H*0.08-Math.max(W,H)*0.8,w:Math.max(W,H)*1.6,h:Math.max(W,H)*1.6,color:kind==="postura"?"ht":kind==="verifica"?"ok":"ac",alpha:D?0.2:0.1,name:"Brillo de fondo"});
+  let y=pad;
+  add({type:"text",name:"Antetítulo",text:("Radar Tecnopolítico · "+(t.category||"")).slice(0,58),upper:true,font:"mono",weight:500,size:px(22),color:"ac",x:pad,y,w:W-2*pad-px(120),h:px(30)});
+  add({type:"heat",name:"Temperatura",level:t.heat||1,x:W-pad-px(95),y,w:px(95),h:px(26)});
+  y+=px(38);add({type:"text",name:"Lugar y fecha",text:[t.place,ST[t.status],t._rdate?shortDate(t._rdate):""].filter(Boolean).join("  ·  ").slice(0,70),upper:true,font:"mono",size:px(21),color:"mu",x:pad,y,w:W-2*pad,h:px(28)});
+  y+=px(wide?54:62);
+  const fy=H-pad-px(70);
+  add({type:"line",name:"Línea del pie",color:"ln",x:pad,y:fy,w:W-2*pad,h:Math.max(1,px(2))});
+  const srcs=kind==="postura"?"Opinión editorial basada en: "+(t.sources||[]).slice(0,3).map(s=>outletShort(s)).join(" · "):"Fuentes: "+(t.sources||[]).slice(0,4).map(s=>outletShort(s)).join(" · ");
+  add({type:"text",name:"Fuentes",text:srcs,size:px(19),color:"mu",x:pad,y:fy+px(22),w:W-2*pad-px(340),h:px(26)});
+  add({type:"text",name:"Firma",text:"Fundación Casa del Bosque",weight:600,size:px(21),align:"right",color:"fg",x:W-pad-px(330),y:fy+px(21),w:px(330),h:px(28)});
+  return {W,H,wide,sq:W===H,tall:H>W*1.5,px,pad,add,y,bottom:fy-px(28),doc:()=>({v:1,W,H,pal:D?"noche":"papel",colors:{},bg:"bg",layers:L})}}
+/* coloca un texto que fluye: calcula su alto y lo limita al espacio disponible (el lienzo reduce la letra si hace falta) */
+function ikT(o,maxLines,maxH){sizeH(o,maxLines);if(maxH!=null&&o.h>maxH)o.h=Math.max(8,maxH);return o}
+function ikGrow(o,maxH,maxS){sizeH(o);while(o.size<maxS){o.size+=2;sizeH(o);if(o.h>maxH){o.size-=2;sizeH(o);break}}if(o.h>maxH)o.h=Math.max(8,maxH);return o}
+function ikGrowList(o,maxS){const c=mctx();const tot=sz=>{c.font=fontOf(o,sz);const lh=Math.round(sz*1.32),g=Math.round(sz*0.6);return o.items.reduce((a,it)=>a+edWrap(c,it,o.w-sz*1.9).length*lh+g,0)-g};while(o.size<maxS&&tot(o.size+2)<=o.h)o.size+=2;return o}
+function ikLabel(f,text,x,y,w,color){return f.add({type:"text",name:"Rótulo: "+text,text,upper:true,font:"mono",weight:500,size:f.px(20),color:color||"mu",x,y,w,h:f.px(28)})}
+function infoKindTemplate(t,fid,kind){const f=ikFrame(t,fid,kind),{W,wide,px,pad,add}=f;let y=f.y;const bottom=f.bottom,CW=W-2*pad;
+  const title=(size,lines,w,x,color)=>{const o=ikT({type:"text",name:"Título",text:t.title,font:"disp",weight:800,size:px(size),lh:1.06,color:color||"fg",x:x==null?pad:x,y,w:w||CW},lines);add(o);y+=o.h+px(22);return o};
+  if(kind==="cifra"){const st=findStat(t);
+    const big=(x,w,start)=>{const o={type:"text",name:"Cifra",text:st.value,font:"disp",weight:800,size:px(start),lh:1,color:"ac",x,y,w};const c=mctx();for(;;){c.font=fontOf(o,o.size);if(c.measureText(String(o.text)).width<=w*0.97||o.size<=20)break;o.size-=4}ikT(o,1);add(o);y+=o.h+px(18);return o};
+    if(wide){const lw=Math.round(W*0.5)-pad;const ry0=y;title(f.sq?46:42,f.sq?4:3,lw);y+=px(10);big(pad,lw,f.sq?150:170);
+      const lb=ikT({type:"text",name:"Qué mide la cifra",text:ikCut(st.label,220),size:px(26),lh:1.35,color:"fg",x:pad,y,w:lw},6,bottom-y);add(lb);
+      const rx=Math.round(W*0.5)+px(36),rw=W-rx-pad;let yy=ry0;ikLabel(f,"Por qué importa",rx,yy,rw,"ht");yy+=px(40);
+      add(ikT({type:"text",name:"Por qué importa",text:ikCut(t.whyItMatters||t.hook,f.sq?420:340),size:px(28),lh:1.4,color:"fg",bar:"ht",x:rx,y:yy,w:rw},12,bottom-yy))}
+    else{title(f.tall?58:50,3);y+=px(f.tall?40:16);big(pad,CW,f.tall?260:220);
+      const lb=ikT({type:"text",name:"Qué mide la cifra",text:ikCut(st.label,240),size:px(f.tall?34:30),lh:1.35,color:"fg",x:pad,y,w:CW},5);add(lb);y+=lb.h+px(f.tall?60:36);
+      if(bottom-y>px(120)){ikLabel(f,"Por qué importa",pad,y,CW,"ht");y+=px(40);add(ikT({type:"text",name:"Por qué importa",text:ikCut(t.whyItMatters||t.hook,f.tall?420:300),size:px(f.tall?32:28),lh:1.4,color:"mu",bar:"ht",x:pad,y,w:CW},10,bottom-y))}}}
+  else if(kind==="explica"){const unk=(t.unknowns||[]).slice(0,3);
+    if(wide){title(f.sq?50:46,f.sq?3:2);const top=y,lw=Math.round((CW-px(48))/2),rx=pad+lw+px(48);
+      ikLabel(f,"Qué pasó",pad,y,lw,"ac");y+=px(40);add(ikT({type:"text",name:"Qué pasó",text:ikCut(t.whatHappened,f.sq?420:520),size:px(26),lh:1.42,color:"fg",x:pad,y,w:lw},14,bottom-y));
+      let yy=top;ikLabel(f,"Por qué importa",rx,yy,lw,"ht");yy+=px(40);const wm=ikT({type:"text",name:"Por qué importa",text:ikCut(t.whyItMatters,f.sq?240:260),size:px(25),lh:1.4,color:"fg",bar:"ht",x:rx,y:yy,w:lw},8,(bottom-yy)*(unk.length?0.55:1));add(wm);yy+=wm.h+px(30);
+      if(unk.length&&bottom-yy>px(110)){ikLabel(f,"Lo que aún no sabemos",rx,yy,lw,"mu");yy+=px(40);add({type:"list",name:"Lo que aún no sabemos",items:unk.map(u=>ikCut(u,120)),size:px(22),color:"mu",bullet:"ln",x:rx,y:yy,w:lw,h:bottom-yy})}}
+    else{title(f.tall?62:54,f.tall?4:3);const avail=bottom-y,sec=(lab,col,txt,share,n,sz,bar)=>{if(!txt)return;ikLabel(f,lab,pad,y,CW,col);y+=px(40);const o=ikT({type:"text",name:lab,text:ikCut(txt,n),size:px(sz),lh:1.4,color:"fg",bar:bar?col:undefined,x:pad,y,w:CW},20,Math.round(avail*share)-px(70));add(o);y+=o.h+px(30)};
+      sec("Qué pasó","ac",t.whatHappened,unk.length?0.42:0.55,f.tall?560:380,f.tall?32:27);sec("Por qué importa","ht",t.whyItMatters,0.3,f.tall?320:230,f.tall?30:26,true);
+      if(unk.length&&bottom-y>px(110)){ikLabel(f,"Lo que aún no sabemos",pad,y,CW,"mu");y+=px(40);add({type:"list",name:"Lo que aún no sabemos",items:unk.map(u=>ikCut(u,130)),size:px(f.tall?28:24),color:"mu",bullet:"ln",x:pad,y,w:CW,h:bottom-y})}}}
+  else if(kind==="voces"){const ps=(t.perspectives||[]).filter(p=>p&&p.view).slice(0,4);
+    title(wide?(f.sq?46:44):(f.tall?58:50),wide?2:3);ikLabel(f,"Quién dice qué",pad,y,CW,"ac");y+=px(42);
+    const cols=(wide||ps.length===4)&&!f.tall?2:1,rows=Math.ceil(ps.length/cols),g=px(20),cw=Math.round((CW-g*(cols-1))/cols),ch=Math.floor((bottom-y-g*(rows-1))/rows);
+    ps.forEach((p,i)=>{const cx=pad+(i%cols)*(cw+g),cy=y+Math.floor(i/cols)*(ch+g);
+      add({type:"rect",name:"Tarjeta "+(i+1),fill:"bg2",stroke:"ln",sw:Math.max(1,px(2)),r:px(16),x:cx,y:cy,w:cw,h:ch});
+      const who=ikT({type:"text",name:"Quién "+(i+1),text:p.who||"",weight:700,size:px(cols===2?24:28),lh:1.25,color:"ac",x:cx+px(22),y:cy+px(20),w:cw-px(44)},2);add(who);
+      const vy=cy+px(20)+who.h+px(10);add(ikGrow({type:"text",name:"Qué dice "+(i+1),text:ikCut(p.view,cols===2?200:260),size:px(cols===2?24:28),lh:1.36,color:"fg",x:cx+px(22),y:vy,w:cw-px(44)},cy+ch-vy-px(18),px(cols===2?32:36)))})}
+  else if(kind==="crono"){const it=cronoItems(t);
+    title(wide?(f.sq?46:44):(f.tall?58:50),wide?2:3);ikLabel(f,"Cronología",pad,y,CW,"ac");y+=px(46);
+    const n=it.length,step=Math.floor((bottom-y)/n),lx=pad+px(12),dw=px(wide?150:170),tx=pad+px(44)+dw,tw=W-pad-tx;
+    add({type:"line",name:"Línea de tiempo",color:"ln",x:lx-Math.max(1,px(1)),y:y+px(12),w:Math.max(2,px(3)),h:step*(n-1)+px(2)});
+    it.forEach((e,i)=>{const yy=y+i*step;add({type:"ellipse",name:"Punto "+(i+1),fill:i===n-1?"ht":"ac",x:lx-px(11),y:yy+px(2),w:px(22),h:px(22)});
+      add({type:"text",name:"Fecha "+(i+1),text:e.label,font:"mono",weight:600,size:px(24),color:i===n-1?"ht":"ac",x:pad+px(40),y:yy,w:dw,h:px(32)});
+      add({type:"text",name:"Hecho "+(i+1),text:ikCut(e.text,wide?190:240),size:px(wide?23:26),lh:1.34,color:"fg",x:tx,y:yy,w:tw,h:step-px(22)})})}
+  else if(kind==="verifica"){const ch=t.ami.check.slice(0,4).map(c=>ikCut(c,200));
+    if(wide){const lw=Math.round(W*0.4)-pad;const top=y;add(ikT({type:"text",name:"Encabezado",text:"Antes de compartir",font:"disp",weight:800,size:px(f.sq?66:72),lh:1.04,color:"ok",x:pad,y,w:lw},3));y+=px(f.sq?160:170);
+      ikLabel(f,"Sobre esta noticia",pad,y,lw);y+=px(38);add(ikT({type:"text",name:"Título",text:t.title,weight:600,size:px(28),lh:1.3,color:"fg",x:pad,y,w:lw},7,bottom-y));
+      const rx=Math.round(W*0.4)+px(30);add(ikGrowList({type:"list",name:"Cómo verificar",items:ch,size:px(27),color:"fg",bullet:"ok",x:rx,y:top,w:W-rx-pad,h:bottom-top},px(44)))}
+    else{add(ikT({type:"text",name:"Encabezado",text:"Antes de compartir",font:"disp",weight:800,size:px(f.tall?96:80),lh:1.04,color:"ok",x:pad,y,w:CW},2));y+=px(f.tall?120:100);
+      ikLabel(f,"Sobre esta noticia",pad,y,CW);y+=px(38);const tt=ikT({type:"text",name:"Título",text:t.title,weight:600,size:px(30),lh:1.3,color:"mu",x:pad,y,w:CW},3);add(tt);y+=tt.h+px(f.tall?60:36);
+      add(ikGrowList({type:"list",name:"Cómo verificar",items:ch,size:px(f.tall?34:29),color:"fg",bullet:"ok",x:pad,y,w:CW,h:bottom-y},px(44)))}}
+  else if(kind==="postura"){ikLabel(f,"Opinión · Nuestra postura",pad,y,CW,"ht");y+=px(44);
+    const tt=ikT({type:"text",name:"Sobre",text:t.title,weight:600,size:px(wide?26:30),lh:1.3,color:"mu",x:pad,y,w:CW},2);add(tt);y+=tt.h+px(wide?20:36);
+    add({type:"text",name:"Comillas",text:"“",font:"disp",weight:800,size:px(wide?150:200),lh:1,color:"ht",x:pad-px(6),y:y-px(10),w:px(140),h:px(wide?120:160)});y+=px(wide?100:140);
+    add(ikGrow({type:"text",name:"Postura",text:ikCut(t.stance,wide?(f.sq?360:330):(f.tall?520:380)),font:"disp",weight:700,size:px(wide?(f.sq?36:38):(f.tall?50:42)),lh:1.24,color:"fg",x:pad,y,w:CW},bottom-y-px(10),px(wide?58:66)))}
+  return f.doc()}
+function ikindCtl(t){return '<div class="seg2 ikinds" role="group" aria-label="Tipo de infografía">'+IKINDS.map(k=>{const ok=ikOK(t,k[0]);return '<button data-ikind="'+k[0]+'" aria-pressed="'+(effKind(t)===k[0])+'"'+(ok?"":' disabled title="Esta noticia no tiene datos suficientes para este tipo"')+'>'+esc(k[1])+"</button>"}).join("")+"</div>"}
 function igTemplate(t,i){const sl=(t.ig&&t.ig.slides)||[];const s=sl[i]||{title:"",body:""};const W=1080,H=1350,pad=90;const L=[];const add=o=>{o.id=eid();L.push(o);return o};const N=sl.length;
   add({type:"glow",name:"Brillo de fondo",x:W*0.3,y:-H*0.5,w:W*1.6,h:W*1.6,color:i===0?"ht":"ac",alpha:0.18});
   add({type:"text",name:"Antetítulo",text:"Radar Tecnopolítico · "+(t.category||""),upper:true,font:"mono",weight:500,size:24,color:"ac",x:pad,y:pad,w:W-2*pad-150,h:32});
@@ -2147,9 +2236,9 @@ function igTemplate(t,i){const sl=(t.ig&&t.ig.slides)||[];const s=sl[i]||{title:
 
 /* ---------- estado del editor ---------- */
 let ED=null; /* {kind,i,key,doc,sel,hist,fut} */
-const edKeyFor=(t,kind,i)=>kind==="info"?"info/"+gk(t)+"/"+infoFmt:"ig/"+gk(t)+"/"+i;
+const edKeyFor=(t,kind,i)=>kind==="info"?ikey(t):"ig/"+gk(t)+"/"+i;
 async function edStart(kind,i){const t=currentTopic();if(!t)return;const key=edKeyFor(t,kind,i);const saved=await edGet(key);
-  ED={tkey:gk(t),kind,i,key,doc:saved?JSON.parse(JSON.stringify(saved)):(kind==="info"?infoTemplate(t,infoFmt):igTemplate(t,i)),sel:null,hist:[],fut:[]};renderDesk()}
+  ED={tkey:gk(t),kind,i,key,doc:saved?JSON.parse(JSON.stringify(saved)):(kind==="info"?(effKind(t)!=="datos"?infoKindTemplate(t,infoFmt,effKind(t)):infoTemplate(t,infoFmt)):igTemplate(t,i)),sel:null,hist:[],fut:[]};renderDesk()}
 function edClose(){ED=null;renderDesk()}
 function edSnap(){if(!ED)return;ED.hist.push(JSON.stringify(ED.doc));if(ED.hist.length>60)ED.hist.shift();ED.fut=[]}
 let edSaveH=null;function edSave(){if(!ED)return;clearTimeout(edSaveH);const k=ED.key,d=JSON.parse(JSON.stringify(ED.doc));edSaveH=setTimeout(()=>edPut(k,d),250)}
@@ -2309,7 +2398,7 @@ document.addEventListener("click",async e=>{const b=e.target.closest("[data-iged
   dbRef=db;lastWake=Date.now();
   subscribeLayers(db);subscribeProp(db);
   subscribeMeta();
-  subscribeReports();
+  subscribeReports();loadFileReps();setInterval(()=>{if(!document.hidden)loadFileReps()},5*60*1000);
 })();
 })();
 
