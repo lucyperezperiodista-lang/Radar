@@ -450,6 +450,12 @@ body.fs-open{overflow:hidden}
 .ikinds{margin:0 0 12px}.seg2 button:disabled{opacity:.38;cursor:not-allowed}.ikhint{margin:2px 0 6px;font-size:12.5px;color:var(--muted)}
 .iwrap{background:var(--sunk);border-radius:10px;padding:12px;display:grid;place-items:center}
 .iwrap canvas{max-width:100%;max-height:72vh;height:auto;border-radius:6px;box-shadow:0 6px 24px rgba(0,0,0,.25)}
+.resbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:8px 0 12px}
+.resmodal{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.62);overflow:auto;padding:24px 16px;overscroll-behavior:contain}
+.resbox{max-width:1200px;margin:0 auto;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:14px;padding:16px 18px 20px}
+.reshead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px}.reshead h3{margin:2px 0 0;font-size:18px}
+body.resopen{overflow:hidden}
+@media (max-width:640px){.resmodal{padding:0}.resbox{border-radius:0;min-height:100%;padding:14px 16px}}
 
 /* ===== investigación ===== */
 .board.mode-inv{grid-template-columns:1fr}
@@ -748,7 +754,7 @@ function postBox(s,opt){opt=opt||{};
 /* ---------- mesa de redacción ---------- */
 function renderDesk(){
   const desk=$("#desk"), t=currentTopic();
-  if(ED&&(!t||ED.tkey!==gk(t)||(ED.kind==="info"?tab!=="info":tab!=="ig")))ED=null;
+  if(ED&&ED.kind!=="res"&&(!t||ED.tkey!==gk(t)||(ED.kind==="info"?tab!=="info":tab!=="ig")))ED=null;
   if(!t){desk.innerHTML='<div class="pane"><p class="note">Elige un tema para ver el análisis y los borradores.</p></div>';return}
   const key=gk(t), done=!!published[key];
   const tabsDef=[["analisis","Análisis"],["x","Post para X"],["hilo","Hilo para X"],["ig","Instagram"],["fb","Facebook"],["li","LinkedIn"],["info","Infografía"],["fuentes","Fuentes ("+(t.sources||[]).length+")"],["chat","Conversar con Claude"]].filter(x=>!(PUB&&x[0]==="chat"));
@@ -802,8 +808,9 @@ function renderDesk(){
     '<div class="tabs" role="tablist">'+tabsDef.map(([k,l])=>'<button class="tab" role="tab" data-tab="'+k+'" aria-selected="'+(k===tab)+'">'+esc(l)+"</button>").join("")+"</div>"+
     '<div class="pane" role="tabpanel">'+body+"</div>";
   if(tab==="chat")afterChatRender();
-  if(tab==="info"&&!ED)drawInfo(t);
-  if(ED)edMount();else if(tab==="ig")drawIgThumbs(t);
+  const edDesk=ED&&ED.kind!=="res";
+  if(tab==="info"&&!edDesk)drawInfo(t);
+  if(edDesk)edMount();else if(tab==="ig")drawIgThumbs(t);
 }
 
 /* ---------- chat por tema ---------- */
@@ -1287,7 +1294,7 @@ function hhiLabel(h){return h<1500?"baja":h<=2500?"moderada":"alta"}
 
 function invHTML(){
   const tabs='<div class="seg inv-tabs" role="tablist"><button role="tab" data-invtab="cables" aria-selected="'+(invTab==="cables")+'">Cables de internet</button><button role="tab" data-invtab="medios" aria-selected="'+(invTab==="medios")+'">Medios de comunicación</button><button role="tab" data-invtab="minerales" aria-selected="'+(invTab==="minerales")+'">Minerales y tierras raras</button></div>';
-  return '<div class="vhead"><div><div class="label">Investigación</div><h3>'+(invTab==="cables"?"¿Quién es dueño de internet bajo el mar?":invTab==="minerales"?"¿Quién controla los minerales de la tecnología?":"¿Quién es dueño de los medios?")+"</h3></div>"+tabs+"</div>"+contentHTML()+(invTab==="cables"?invCables():invTab==="minerales"?invMinerales():invMedios());
+  return '<div class="vhead"><div><div class="label">Investigación</div><h3>'+(invTab==="cables"?"¿Quién es dueño de internet bajo el mar?":invTab==="minerales"?"¿Quién controla los minerales de la tecnología?":"¿Quién es dueño de los medios?")+"</h3></div>"+tabs+"</div>"+'<div class="resbar"><button class="btn" data-resopen="null">📊 Infografía de lo que estás viendo</button><span class="note">Con gráficas de los datos de la investigación. Para una mina, empresa o medio, abre su ficha.</span></div>'+contentHTML()+(invTab==="cables"?invCables():invTab==="minerales"?invMinerales():invMedios());
 }
 function invCables(){
   const S=cableStats(), O=["publica","mixta","privada","consorcio","sin_datos"];
@@ -2014,7 +2021,7 @@ async function csend(text){text=String(text||"").trim();if(!text||cbusy||!sample
     const all=store.get(k)||[];all.push({role:"assistant",content:r.text+(r.truncated?"\n\n(Respuesta cortada. Pide que continúe.)":"")});store.set(k,all.slice(-30));
   }catch(e){const all=store.get(k)||[];const kept=e&&e.text?e.text+"\n\n":"";all.push({role:"assistant",content:kept+"⚠️ "+(ERR[e&&e.code]||"No pude responder ahora. Intenta de nuevo.")});store.set(k,all.slice(-30))}
   finally{cbusy=false;cctl=null;if(view==="inv")rerenderContent()}}
-function cFocusBtn(kind,id,label,extra){if(PUB)return "";return '<button class="btn csmall" data-cfocus="'+esc(JSON.stringify(Object.assign({kind,id,label},extra||{})))+'">✎ Crear contenido con esta ficha</button>'}
+function cFocusBtn(kind,id,label,extra){const js=esc(JSON.stringify(Object.assign({kind,id,label},extra||{})));return (PUB?"":'<button class="btn csmall" data-cfocus="'+js+'">✎ Crear contenido con esta ficha</button> ')+'<button class="btn csmall" data-resopen="'+js+'">📊 Infografía de esta ficha</button>'}
 document.addEventListener("click",e=>{
   if(e.target.closest("[data-copen]")){copen=!copen;store.set("radar-copen",copen);rerenderContent();return}
   const q=e.target.closest("[data-cquick]");if(q){csend(q.dataset.cquick);return}
@@ -2104,6 +2111,7 @@ async function drawDoc(cv,doc){cv.width=doc.W;cv.height=doc.H;const ctx=cv.getCo
       lay.forEach((o,i)=>{const cy=L.y+o.y+Math.round(lay.lh/2)-2,r=Math.round(size*0.56);ctx.fillStyle=ecol(doc,L.bullet||"ac");ctx.beginPath();ctx.arc(L.x+r,cy,r,0,Math.PI*2);ctx.fill();
         ctx.fillStyle=ecol(doc,"bg");ctx.font="700 "+Math.round(size*0.62)+"px "+EF.mono;ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(String(i+1),L.x+r,cy+1);ctx.textAlign="left";ctx.textBaseline="top";
         ctx.fillStyle=ecol(doc,L.color||"fg");ctx.font=fontOf(L,size);o.ls.forEach((ln,j)=>ctx.fillText(ln,L.x+size*1.7,L.y+o.y+j*lay.lh))})}
+    else if(T==="chart"){drawChart(ctx,doc,L)}
     else if(T==="image"){const im=await layerImage(L);if(im){if(L.fit==="cover"){const k=Math.max(L.w/im.width,L.h/im.height);ctx.beginPath();ctx.rect(L.x,L.y,L.w,L.h);ctx.clip();ctx.drawImage(im,L.x+(L.w-im.width*k)/2,L.y+(L.h-im.height*k)/2,im.width*k,im.height*k)}else drawFit(ctx,im,L.x,L.y,L.w,L.h)}}
     ctx.restore()}}
 function hexA(c,a){const m=/^#([0-9a-f]{6})/i.exec(c);if(!m)return c;const n=parseInt(m[1],16);return "rgba("+(n>>16&255)+","+(n>>8&255)+","+(n&255)+","+a+")"}
@@ -2219,6 +2227,168 @@ function infoKindTemplate(t,fid,kind){const f=ikFrame(t,fid,kind),{W,wide,px,pad
     add(ikGrow({type:"text",name:"Postura",text:ikCut(t.stance,wide?(f.sq?360:330):(f.tall?520:380)),font:"disp",weight:700,size:px(wide?(f.sq?36:38):(f.tall?50:42)),lh:1.24,color:"fg",x:pad,y,w:CW},bottom-y-px(10),px(wide?58:66)))}
   return f.doc()}
 function ikindCtl(t){return '<div class="seg2 ikinds" role="group" aria-label="Tipo de infografía">'+IKINDS.map(k=>{const ok=ikOK(t,k[0]);return '<button data-ikind="'+k[0]+'" aria-pressed="'+(effKind(t)===k[0])+'"'+(ok?"":' disabled title="Esta noticia no tiene datos suficientes para este tipo"')+'>'+esc(k[1])+"</button>"}).join("")+"</div>"}
+/* ---------- infografías de la investigación (cables, medios, minerales) ---------- */
+let RS=null; /* {focus,label,ctx,R,fmt,tpl,ch,skey} */
+const RTPL=[["resumen","Resumen con gráfica"],["grafica","Gráfica grande"],["crono","Cronología"],["ficha","Ficha de datos"]];
+const CHPAL=["ac","ht","ok","mu","fg","ln"];
+const TCOLK={publica:"ok",mixta:"ht",privada:"ac",consorcio:"mu",comunitaria:"fg",sin_datos:"ln"};
+const CHK={hbar:"Barras horizontales",bar:"Columnas",donut:"Dona",line:"Línea"};
+function nfmt(v){const n=+v;if(v==null||v===""||!isFinite(n))return String(v==null?"":v);const a=Math.abs(n);
+  if(a>=1e9)return (n/1e9).toLocaleString("es-CO",{maximumFractionDigits:1})+" mil M";if(a>=1e6)return (n/1e6).toLocaleString("es-CO",{maximumFractionDigits:1})+" M";
+  return n.toLocaleString("es-CO",{maximumFractionDigits:a<10?1:0})}
+const fmtV=(v,u)=>u==="%"?nfmt(v)+" %":nfmt(v)+(u?" "+u:"");
+const shortTech=s=>String(s||"").replace(/\s*\(.*$/,"").replace(/^./,c=>c.toUpperCase()).slice(0,48);
+const fmtDay=d=>{const m=/^(\d{4})(?:-(\d{2}))?(?:-(\d{2}))?/.exec(String(d||""));if(!m)return String(d||"");return (m[3]?+m[3]+" ":"")+(m[2]?IKMC[+m[2]]+" ":"")+m[1]};
+const iso3n=k=>isoName((RES.iso2of||{})[k]||k)||k;
+function topN(obj,n,lab){return Object.entries(obj).sort((a,b)=>b[1]-a[1]).slice(0,n).map(([k,v])=>({label:lab?lab(k):k,value:v}))}
+function resBuild(ctx){const R={title:"",kicker:"Investigación",stat:null,charts:[],facts:[],timeline:[],sources:[]};const A=ctx.alcance;const src=s=>{if(s&&!R.sources.includes(s))R.sources.push(s)};
+  const cut=(s,n)=>ikCut(s,n);
+  if(A==="un mineral"){const nm=ctx.mineral;R.title=nm+": quién lo produce y quién lo controla";R.kicker="Investigación · Minerales para la tecnología";
+    const P=ctx.produccion,F=ctx.refinado,V=ctx.reservas;
+    const srcShort=s=>String(s||"").split(/[,(:]/)[0].trim().slice(0,40);
+    if(P&&P.paises&&P.paises.length){const sh=P.paises[0].share!=null;R.charts.push({title:"Producción minera por país"+(P.anio?" ("+P.anio+")":""),kind:"hbar",unit:sh?"%":"",data:P.paises.slice(0,7).map(c=>({label:isoName(c.iso2)||c.iso2,value:sh?c.share:c.value})),src:srcShort(P.fuente)});src(srcShort(P.fuente));
+      const c0=P.paises[0];if(c0.share!=null)R.stat={value:nfmt(c0.share)+" %",label:"de la producción minera mundial"+(P.anio?" ("+P.anio+")":"")+" sale de "+(isoName(c0.iso2)||c0.iso2)}}
+    if(F&&F.paises&&F.paises.length){R.charts.push({title:"Refinación por país"+(F.anio?" ("+F.anio+")":""),kind:"hbar",unit:"%",data:F.paises.filter(c=>c.share!=null).slice(0,7).map(c=>({label:isoName(c.iso2)||c.iso2,value:c.share})),src:srcShort(F.fuente)});src(srcShort(F.fuente));
+      const c0=F.paises[0];if(c0.share!=null&&(!R.stat||c0.share>parseFloat(String(R.stat.value).replace(",","."))))R.stat={value:nfmt(c0.share)+" %",label:"de la refinación mundial"+(F.anio?" ("+F.anio+")":"")+" está en "+(isoName(c0.iso2)||c0.iso2)}}
+    if(V&&V.paises&&V.paises.length){R.charts.push({title:"Reservas por país",kind:"hbar",unit:"t",data:V.paises.filter(c=>c.value!=null).slice(0,7).map(c=>({label:isoName(c.iso2)||c.iso2,value:c.value})),src:srcShort(V.fuente)});src(srcShort(V.fuente))}
+    const us=(ctx.usos_detalle||[]).filter(u=>u.share!=null);if(us.length>=2)R.charts.push({title:"Para qué se usa (% de la demanda)",kind:"donut",unit:"%",data:us.slice(0,6).map(u=>({label:shortTech(u.tech),value:u.share}))});
+    if(ctx.usos)R.facts.push("Usos: "+cut(ctx.usos,170));if(ctx.notas)R.facts.push(cut(ctx.notas,200));
+    if((ctx.compradores||[]).length)R.facts.push((ctx.compradores.length>=25?"Al menos 25":ctx.compradores.length)+" acuerdos de compra documentados en el radar, entre ellos los de "+[...new Set(ctx.compradores.map(c=>c.comprador))].slice(0,3).join(", ")+".");
+    if((ctx.sitios||[]).length)R.facts.push((ctx.sitios.length>=40?"Más de 40":ctx.sitios.length)+" minas, salares o refinerías de "+nm.toLowerCase()+" en el mapa del radar.");
+    R.timeline=(ctx.controles_exportacion||[]).slice().sort((a,b)=>String(a.fecha).localeCompare(String(b.fecha))).slice(-6).map(x=>({label:fmtDay(x.fecha),text:(isoName(x.actor)||x.actor||"")+": "+cut(x.medida,170)}))}
+  else if(A==="una mina o planta"){const s=ctx.sitio,f=s.f||{};R.title=s.name.replace(/\s*\(.*\)\s*$/,"");R.kicker="Investigación · "+({mina:"Mina",salar:"Salar",refineria:"Refinería",proyecto:"Proyecto"}[s.kind]||"Sitio")+" · "+(ctx.sitio.pais||"");
+    if(s.state_pct!=null)R.stat={value:nfmt(s.state_pct)+" %",label:"de participación estatal"+(s.state_holder?": "+cut(s.state_holder,90):"")};else if((s.compras||[]).length)R.stat={value:String(s.compras.length),label:"acuerdos de compra documentados para este sitio"};
+    const ow=(s.owners||[]).filter(o=>o.pct!=null);if(ow.length)R.charts.push({title:"Quién es dueño (% de participación)",kind:ow.length>2?"donut":"hbar",unit:"%",data:ow.slice(0,6).map(o=>({label:cut(o.name,40),value:o.pct}))});
+    if(f.summary||s.note)R.facts.push(cut(f.summary||s.note,240));if(s.operator)R.facts.push("Opera: "+cut(s.operator,120)+".");
+    const env=f.environment||{};if(env.water)R.facts.push("Agua: "+cut(env.water,200));if(f.communities&&f.communities.text)R.facts.push("Comunidades: "+cut(f.communities.text,200));
+    const by=[...new Set((s.compras||[]).map(c=>c.comprador))];if(by.length)R.facts.push("Compran su producción: "+by.slice(0,5).join(", ")+".");
+    R.timeline=(f.history||[]).slice(-6).map(h=>({label:String(h.date||""),text:cut(h.event,170)}));
+    (f.sources||[]).slice(0,4).forEach(x=>src(x.outlet));if(!R.sources.length&&s.src)src(cut(s.src,50))}
+  else if(A==="una empresa dueña de cables submarinos"){const i=ctx.propiedad||{},cs=ctx.cables||[];R.title=ctx.empresa+": sus cables submarinos";R.kicker="Investigación · Dueños de internet";
+    R.stat={value:String(cs.length),label:"cables submarinos activos en los que participa"};
+    const dec={};cs.forEach(c=>{if(c.anio){const d=Math.floor(c.anio/10)*10;dec[d]=(dec[d]||0)+1}});if(Object.keys(dec).length>1)R.charts.push({title:"Cables por década de entrada en servicio",kind:"bar",unit:"",data:Object.keys(dec).sort().map(d=>({label:d+"s",value:dec[d]}))});
+    const kc={};cs.forEach(c=>(c.paises||[]).forEach(k=>kc[k]=(kc[k]||0)+1));if(Object.keys(kc).length)R.charts.push({title:"Países donde más aterrizan sus cables",kind:"hbar",unit:"",data:topN(kc,7,iso3n)});
+    const pc={};cs.forEach(c=>(c.socios||[]).forEach(o=>{if(o!==ctx.empresa)pc[o]=(pc[o]||0)+1}));if(Object.keys(pc).length)R.charts.push({title:"Socios más frecuentes (cables compartidos)",kind:"hbar",unit:"",data:topN(pc,6)});
+    R.facts.push("Propiedad: "+(TLAB[i.t]||"sin datos")+(i.pct!=null?" ("+nfmt(i.pct)+" % estatal)":"")+(i.h?". "+cut(i.h,110):"")+".");if(i.g)R.facts.push("Grupo o matriz: "+cut(i.g,110)+".");if(i.note)R.facts.push(cut(i.note,200));
+    R.timeline=cs.filter(c=>c.anio).sort((a,b)=>a.anio-b.anio).slice(-6).map(c=>({label:String(c.anio),text:c.cable}));src("TeleGeography 2026");if(i.src)src(cut(i.src,50))}
+  else if(A==="un medio de comunicación"){const m=ctx.medio;R.title=m.name;R.kicker="Investigación · Dueños de los medios · "+ctx.pais;
+    R.stat={value:TLAB[m.t]||"Sin datos",label:"tipo de propiedad"+(m.pct?" ("+nfmt(m.pct)+" % estatal)":"")};
+    if(m.owner)R.facts.push("Dueño: "+cut(m.owner,180));if(m.biz)R.facts.push("Otros negocios del dueño: "+cut(m.biz,200));if((m.brands||[]).length)R.facts.push("Marcas: "+m.brands.slice(0,5).join(", ")+".");
+    const cc=ctx.contexto_pais&&ctx.contexto_pais.concentracion;if(cc&&cc.value)R.facts.push(cc.value+": "+cut(cc.metric,150)+" ("+cut(cc.year,40)+").");
+    const C=(RES.media||[]).find(c=>c.country===ctx.pais||isoName(c.iso2)===ctx.pais);if(C){const bt={};(C.outlets||[]).forEach(o=>{const t=o.t||"sin_datos";bt[t]=(bt[t]||0)+1});R.charts.push({title:"Medios de "+ctx.pais+" según su propiedad",kind:"donut",unit:"",data:Object.entries(bt).sort((a,b)=>b[1]-a[1]).map(([k,v])=>({label:TLAB[k]||k,value:v,c:TCOLK[k]}))})}
+    if(m.src)src(cut(m.src,50))}
+  else if(A==="medios de un país"){R.title="¿Quién es dueño de los medios en "+ctx.pais+"?";R.kicker="Investigación · Dueños de los medios";
+    const cc=ctx.concentracion;if(cc&&cc.value)R.stat={value:cc.value,label:cut(cc.metric,120)+(cc.year?" ("+cut(cc.year,30)+")":"")};
+    const bt={},own={},med={};(ctx.medios||[]).forEach(o=>{const t=o.propiedad||"sin_datos";bt[t]=(bt[t]||0)+1;if(o.dueno){const k=cut(o.dueno.split(/[,(;]| a través/)[0],42);own[k]=(own[k]||0)+1}if(o.tipo_medio)med[o.tipo_medio]=(med[o.tipo_medio]||0)+1});
+    R.charts.push({title:"Medios según su propiedad",kind:"donut",unit:"",data:Object.entries(bt).sort((a,b)=>b[1]-a[1]).map(([k,v])=>({label:TLAB[k]||k,value:v,c:TCOLK[k]}))});
+    if(Object.keys(own).length)R.charts.push({title:"Dueños con más medios en la lista",kind:"hbar",unit:"",data:topN(own,6)});
+    const ML={tv:"Televisión",radio:"Radio",prensa:"Prensa",digital:"Digital",agencia:"Agencia"};if(Object.keys(med).length>1)R.charts.push({title:"Medios por tipo",kind:"bar",unit:"",data:topN(med,6,k=>ML[k]||k)});
+    if(ctx.notas)R.facts.push(...String(ctx.notas).split(/(?<=\.)\s+/).slice(0,3).map(x=>cut(x,200)));if(cc&&cc.src)src(cut(cc.src,50))}
+  else if(A==="panorama mundial de medios"){R.title="¿Quién es dueño de los medios?";R.kicker="Investigación · Dueños de los medios";R.stat={value:String(ctx.paises),label:"países investigados por el radar"};
+    R.charts.push({title:"Medios según su propiedad (todos los países)",kind:"donut",unit:"",data:Object.entries(ctx.medios_por_tipo_de_propiedad||{}).sort((a,b)=>b[1]-a[1]).map(([k,v])=>({label:TLAB[k]||k,value:v,c:TCOLK[k]}))});
+    const tot=Object.values(ctx.medios_por_tipo_de_propiedad||{}).reduce((a,b)=>a+b,0);R.facts.push(nfmt(tot)+" medios con su dueño identificado o en revisión.")}
+  else if(A==="cables de un país"){const nm=iso3n(ctx.pais);R.title="¿Quién es dueño de los cables que conectan a "+nm+"?";R.kicker="Investigación · Dueños de internet";R.stat={value:String(ctx.cables),label:"cables submarinos llegan a "+nm};
+    R.charts.push({title:"Empresas con más cables en "+nm,kind:"hbar",unit:"",data:(ctx.duenos||[]).slice(0,7).map(d=>({label:cut(d.empresa,40),value:d.cables}))});
+    const bt={};(ctx.duenos||[]).forEach(d=>{const t=d.propiedad||"sin_datos";bt[t]=(bt[t]||0)+1});R.charts.push({title:"Sus dueños según la propiedad",kind:"donut",unit:"",data:Object.entries(bt).sort((a,b)=>b[1]-a[1]).map(([k,v])=>({label:TLAB[k]||k,value:v,c:TCOLK[k]}))});
+    const dd=(ctx.duenos||[]).slice(0,3);if(dd.length)R.facts.push("Empresas con más cables en "+nm+": "+dd.map(d=>d.empresa+" ("+d.cables+")").join(", ")+".");const ext=(ctx.duenos||[]).filter(d=>d.sede&&d.sede!==((RES.iso2of||{})[ctx.pais]||"")).length;if(ext)R.facts.push(ext+" de sus "+(ctx.duenos||[]).length+" empresas dueñas tienen sede fuera del país.");
+    if(ctx.hiperescala)R.facts.push(ctx.hiperescala+" de esos cables tienen como socio a una gran tecnológica (Google, Meta, Amazon o Microsoft).");src("TeleGeography 2026")}
+  else if(A==="panorama mundial de cables submarinos"){R.title="¿Quién es dueño de internet bajo el mar?";R.kicker="Investigación · Dueños de internet";R.stat={value:nfmt(ctx.cables_activos),label:"cables submarinos activos en el mapa de TeleGeography 2026"};
+    R.charts.push({title:"Empresas con más cables",kind:"hbar",unit:"",data:(ctx.top_empresas||[]).slice(0,8).map(d=>({label:cut(d.empresa,40),value:d.cables}))});
+    const CL={solo_privada:"Solo dueños privados",con_estado:"Con participación estatal",solo_publica:"Solo dueños públicos",incompleto:"Sin datos suficientes"},CC={solo_privada:"ac",con_estado:"ht",solo_publica:"ok",incompleto:"ln"};
+    R.charts.push({title:"Cables según quién los controla",kind:"donut",unit:"",data:Object.entries(ctx.cables_por_control||{}).filter(x=>x[1]).map(([k,v])=>({label:CL[k]||k,value:v,c:CC[k]}))});
+    R.charts.push({title:"Empresas dueñas según su propiedad",kind:"donut",unit:"",data:Object.entries(ctx.empresas_por_tipo||{}).sort((a,b)=>b[1]-a[1]).map(([k,v])=>({label:TLAB[k]||k,value:v,c:TCOLK[k]}))});
+    if((ctx.hiperescala_por_periodo||[]).length)R.charts.push({title:"Cables nuevos con una gran tecnológica como socia",kind:"bar",unit:"",data:ctx.hiperescala_por_periodo.map(p=>({label:p.l,value:p.h}))});
+    R.facts.push("Las 4 empresas con más cables suman el "+ctx.cr4+" % de todas las participaciones en cables; las 10 primeras, el "+ctx.cr10+" %.");R.facts.push("Índice de concentración HHI: "+nfmt(ctx.hhi)+" ("+hhiLabel(ctx.hhi)+").");src("TeleGeography 2026")}
+  R.charts=R.charts.filter(c=>c.data&&c.data.length);R.charts.forEach(c=>{if(c.kind==="hbar")c.data.sort((a,b)=>b.value-a.value)});src("Investigación del Radar Tecnopolítico");return R}
+function rtplOK(R,k){return k==="crono"?R.timeline.length>=2:k==="grafica"?R.charts.length>0:true}
+function resTemplate(R,fid,tpl,ci){const F=IFMT.find(f=>f[0]===fid)||IFMT[0];const W=F[2],H=F[3];const wide=W>=H,sq=W===H,tall=H>W*1.5,S=Math.min(W/1080,H/1000),px=n=>Math.round(n*S),pad=Math.round((wide?64:80)*S);
+  const D=infoTheme==="dark";const L=[];const add=o=>{o.id=eid();L.push(o);return o};const CW=W-2*pad;
+  add({type:"glow",x:W*0.85-Math.max(W,H)*0.8,y:H*0.08-Math.max(W,H)*0.8,w:Math.max(W,H)*1.6,h:Math.max(W,H)*1.6,color:"ac",alpha:D?0.2:0.1,name:"Brillo de fondo"});
+  let y=pad;add({type:"text",name:"Antetítulo",text:"Radar Tecnopolítico · Investigación",upper:true,font:"mono",weight:500,size:px(22),color:"ac",x:pad,y,w:CW,h:px(30)});
+  y+=px(38);add({type:"text",name:"Tema",text:R.kicker.replace(/^Investigación · /,""),upper:true,font:"mono",size:px(21),color:"mu",x:pad,y,w:CW,h:px(28)});y+=px(wide?54:62);
+  const fy=H-pad-px(70);add({type:"line",name:"Línea del pie",color:"ln",x:pad,y:fy,w:CW,h:Math.max(1,px(2))});
+  add({type:"text",name:"Fuentes",text:"Fuentes: "+R.sources.slice(0,4).join(" · "),size:px(19),color:"mu",x:pad,y:fy+px(22),w:CW-px(340),h:px(26)});
+  add({type:"text",name:"Firma",text:"Fundación Casa del Bosque",weight:600,size:px(21),align:"right",color:"fg",x:W-pad-px(330),y:fy+px(21),w:px(330),h:px(28)});
+  const bottom=fy-px(28);const ch=R.charts[ci]||R.charts[0];
+  const title=(size,lines,w)=>{const o=ikT({type:"text",name:"Título",text:R.title,font:"disp",weight:800,size:px(size),lh:1.06,color:"fg",x:pad,y,w:w||CW},lines);add(o);y+=o.h+px(24);return o};
+  const stat=(x,w,big)=>{if(!R.stat)return;const v={type:"text",name:"Cifra",text:R.stat.value,font:"disp",weight:800,size:px(big),lh:1,color:"ac",x,y,w};const c=mctx();for(;;){c.font=fontOf(v,v.size);if(c.measureText(String(v.text)).width<=w*0.97||v.size<=20)break;v.size-=4}ikT(v,1);add(v);y+=v.h+px(12);
+    const l=ikT({type:"text",name:"Qué mide la cifra",text:R.stat.label,size:px(26),lh:1.32,color:"fg",x,y,w},3);add(l);y+=l.h+px(30)};
+  const chart=(x,yy,w,h,big)=>{if(!ch)return;ikLabel({add,px},ch.title,x,yy,w,"mu");add({type:"chart",name:"Gráfica: "+ch.title,kind:ch.kind,data:ch.data.map(d=>Object.assign({},d)),unit:ch.unit||"",color:"ac",tc:"fg",size:px(big?30:24),x,y:yy+px(40),w,h:h-px(40)})};
+  const facts=(x,yy,w,h,size,n)=>{const it=R.facts.slice(0,n||4);if(!it.length||h<px(80))return;add(ikGrowList({type:"list",name:"Datos",items:it,size:px(size),color:"fg",bullet:"ac",x,y:yy,w,h},px(size+8)))};
+  if(tpl==="grafica"&&ch){title(wide?(sq?50:46):(tall?62:54),wide?2:3);const capH=R.stat?px(wide?70:90):0;chart(pad,y,CW,bottom-y-capH,true);
+    if(R.stat)add(ikT({type:"text",name:"Pie de gráfica",text:R.stat.value+" "+R.stat.label,size:px(24),lh:1.3,color:"mu",x:pad,y:bottom-capH+px(16),w:CW},2,capH-px(16)))}
+  else if(tpl==="crono"&&R.timeline.length){title(wide?(sq?48:44):(tall?60:52),wide?2:3);ikLabel({add,px},"Cronología",pad,y,CW,"ac");y+=px(46);
+    const it=R.timeline,n=it.length,step=Math.floor((bottom-y)/n),lx=pad+px(12),dw=px(wide?160:180),tx=pad+px(44)+dw,tw=W-pad-tx;
+    add({type:"line",name:"Línea de tiempo",color:"ln",x:lx-1,y:y+px(12),w:Math.max(2,px(3)),h:step*(n-1)+px(2)});
+    it.forEach((e,i)=>{const yy=y+i*step;add({type:"ellipse",name:"Punto "+(i+1),fill:i===n-1?"ht":"ac",x:lx-px(11),y:yy+px(2),w:px(22),h:px(22)});
+      add({type:"text",name:"Fecha "+(i+1),text:e.label,font:"mono",weight:600,size:px(24),color:i===n-1?"ht":"ac",x:pad+px(40),y:yy,w:dw,h:step-px(10)});
+      add(ikGrow({type:"text",name:"Hecho "+(i+1),text:e.text,size:px(wide?23:26),lh:1.34,color:"fg",x:tx,y:yy,w:tw},step-px(22),px(wide?30:34)))})}
+  else if(tpl==="ficha"||!ch){title(wide?(sq?52:48):(tall?66:56),wide?3:3);if(wide){const lw=Math.round(W*0.42)-pad;const y0=y;if(R.stat)stat(pad,lw,sq?120:130);y=y0;const rx=Math.round(W*0.42)+px(30);facts(rx,y,W-rx-pad,bottom-y,28,5)}
+    else{if(R.stat)stat(pad,CW,tall?190:150);facts(pad,y,CW,bottom-y,tall?32:28,5)}}
+  else{/* resumen */
+    if(wide){const lw=Math.round(W*0.46)-pad,rx=Math.round(W*0.46)+px(30),rw=W-rx-pad,y0=y;title(sq?46:42,sq?4:3,lw);stat(pad,lw,sq?110:120);facts(pad,y,lw,bottom-y,sq?22:22,2);chart(rx,y0,rw,bottom-y0,false)}
+    else{title(tall?62:52,3);stat(pad,CW,tall?170:130);const chH=Math.round((bottom-y)*(R.facts.length?0.62:1));chart(pad,y,CW,chH,false);y+=chH+px(26);facts(pad,y,CW,bottom-y,tall?28:24,tall?3:2)}}
+  return {v:1,W,H,pal:D?"noche":"papel",colors:{},bg:"bg",layers:L}}
+/* --- dibujo de gráficas en el lienzo --- */
+function drawChart(ctx,doc,L){const data=(L.data||[]).filter(d=>d&&isFinite(+d.value));if(!data.length)return;const u=L.unit||"",fg=ecol(doc,L.tc||"fg"),mu=ecol(doc,"mu"),ln=ecol(doc,"ln");
+  const colOf=(d,i)=>ecol(doc,d.c||(L.kind==="donut"?CHPAL[i%CHPAL.length]:L.color||"ac"));const B=EF.body,M=EF.mono;const max=Math.max(...data.map(d=>+d.value),0)||1;
+  ctx.textBaseline="middle";
+  if(L.kind==="donut"){const tot=data.reduce((a,d)=>a+Math.max(0,+d.value),0)||1;const side=L.w>L.h*1.25;const r=Math.min(side?L.h:L.h*0.58,side?L.w*0.45:L.w)/2*0.94;const cx=L.x+(side?r+4:L.w/2),cy=L.y+(side?L.h/2:r+4);let a0=-Math.PI/2;
+    data.forEach((d,i)=>{const a=Math.max(0,+d.value)/tot*Math.PI*2;ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,a0,a0+a);ctx.closePath();ctx.fillStyle=colOf(d,i);ctx.fill();a0+=a});
+    ctx.beginPath();ctx.arc(cx,cy,r*0.58,0,Math.PI*2);ctx.fillStyle=ecol(doc,"bg");ctx.fill();
+    ctx.fillStyle=fg;ctx.textAlign="center";const ts=Math.round(r*0.32);ctx.font="800 "+ts+"px "+EF.disp;ctx.fillText(u==="%"?"":nfmt(tot),cx,cy);ctx.textAlign="left";
+    const lx=side?cx+r+Math.max(16,r*0.18):L.x,ly=side?L.y:cy+r+Math.max(14,r*0.12),lw=side?L.x+L.w-lx:L.w,lh=(side?L.h:L.y+L.h-ly);let fs=Math.min(L.size||28,lh/(data.length*1.5));fs=Math.max(11,fs);const rowH=Math.min(lh/data.length,fs*2.1);
+    data.forEach((d,i)=>{const yy=ly+rowH*i+rowH/2;ctx.fillStyle=colOf(d,i);ctx.fillRect(lx,yy-fs*0.4,fs*0.8,fs*0.8);ctx.font="700 "+fs+"px "+B;ctx.fillStyle=fg;const vt=u==="%"?fmtV(d.value,u):fmtV(d.value,u)+" · "+pctS(+d.value,tot);const vw=ctx.measureText(vt).width;
+      ctx.font="400 "+fs+"px "+B;let lab=String(d.label||"");while(lab.length>3&&ctx.measureText(lab).width>lw-fs*1.4-vw-fs){lab=lab.slice(0,-2)}if(lab!==String(d.label||""))lab=lab.replace(/.$/,"…");ctx.fillText(lab,lx+fs*1.3,yy);
+      ctx.font="700 "+fs+"px "+B;ctx.textAlign="right";ctx.fillText(vt,lx+lw,yy);ctx.textAlign="left"});ctx.textBaseline="top";return}
+  if(L.kind==="bar"||L.kind==="line"){const n=data.length,fs=Math.max(11,Math.min(L.size||26,L.w/n/4.2)),labH=fs*2.7,valH=fs*1.6,top=L.y+valH,base=L.y+L.h-labH,hh=Math.max(10,base-top),cw=L.w/n;
+    ctx.fillStyle=ln;ctx.fillRect(L.x,base,L.w,Math.max(1,fs/12));
+    const pts=data.map((d,i)=>({x:L.x+cw*i+cw/2,y:base-(+d.value/max)*hh,d}));
+    if(L.kind==="line"){ctx.strokeStyle=ecol(doc,L.color||"ac");ctx.lineWidth=Math.max(2,fs/6);ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.stroke();pts.forEach((p,i)=>{ctx.beginPath();ctx.arc(p.x,p.y,fs/3,0,Math.PI*2);ctx.fillStyle=colOf(p.d,i);ctx.fill()})}
+    else pts.forEach((p,i)=>{const bw=cw*0.62;ctx.fillStyle=colOf(p.d,i);ctx.beginPath();roundRect(ctx,p.x-bw/2,p.y,bw,base-p.y,Math.min(fs/3,bw/4));ctx.fill()});
+    ctx.textAlign="center";pts.forEach(p=>{ctx.fillStyle=fg;ctx.font="700 "+fs+"px "+B;ctx.fillText(fmtV(p.d.value,u),p.x,p.y-valH/2);ctx.fillStyle=mu;ctx.font="400 "+Math.round(fs*0.9)+"px "+B;
+      const ls=edWrap(ctx,String(p.d.label||""),cw*0.96).slice(0,2);ls.forEach((l,j)=>ctx.fillText(l,p.x,base+fs*0.9+j*fs*1.05))});ctx.textAlign="left";ctx.textBaseline="top";return}
+  /* barras horizontales */
+  const n=data.length,rowH=L.h/n,fs=Math.max(11,Math.min(L.size||26,rowH*0.42));ctx.font="700 "+fs+"px "+B;const vw=Math.max(...data.map(d=>ctx.measureText(fmtV(d.value,u)).width));const lw=Math.min(L.w*0.38,Math.max(...data.map(d=>{ctx.font="400 "+fs+"px "+B;return ctx.measureText(String(d.label||"")).width}))+fs);
+  const bx=L.x+lw,bwMax=Math.max(10,L.w-lw-vw-fs*1.2);
+  data.forEach((d,i)=>{const yy=L.y+rowH*i+rowH/2;ctx.font="400 "+fs+"px "+B;ctx.fillStyle=fg;const ls=edWrap(ctx,String(d.label||""),lw-fs*0.6).slice(0,2);ls.forEach((l,j)=>ctx.fillText(l,L.x,yy+(j-(ls.length-1)/2)*fs*1.1));
+    const bw=Math.max(2,(+d.value/max)*bwMax),bh=Math.min(rowH*0.56,fs*1.5);ctx.fillStyle=colOf(d,i);ctx.beginPath();roundRect(ctx,bx,yy-bh/2,bw,bh,Math.min(bh/3,8));ctx.fill();
+    ctx.font="700 "+fs+"px "+B;ctx.fillStyle=fg;ctx.fillText(fmtV(d.value,u),bx+bw+fs*0.5,yy)});ctx.textBaseline="top"}
+function parseChartData(txt){return String(txt||"").split("\n").map(l=>{const m=/^(.*?)[:=\t]\s*(-?[\d.,]+)\s*%?\s*$/.exec(l.trim());if(!m)return null;let v=m[2];v=/,\d{1,2}$/.test(v)?v.replace(/\./g,"").replace(",","."):v.replace(/[.,](?=\d{3}\b)/g,"");return {label:m[1].trim(),value:+v}}).filter(d=>d&&d.label&&isFinite(d.value))}
+const chartTxt=L=>(L.data||[]).map(d=>d.label+": "+String(d.value).replace(".",",")).join("\n");
+/* --- estudio --- */
+function resFocusFromBtn(d){d.key=d.kind==="mina"?d.id:d.kind+":"+(d.iso2?d.iso2+":":"")+d.id;return d}
+function resOpen(focus){const prev=cfocus;cfocus=focus||null;let ctx=null,label="";try{ctx=cContext();label=cScopeLabel()}catch(e){console.error(e)}cfocus=prev;if(!ctx)return;
+  const R=resBuild(ctx);const skey=(focus?focus.key:"scope:"+cKey().replace(/^radar-cchat\//,""));
+  if(ED&&ED.kind!=="res")ED=null;RS={focus,label,ctx,R,fmt:infoFmt,tpl:R.charts.length?"resumen":"ficha",ch:0,skey};ED=null;renderResStudio()}
+const resKey=()=>"res/"+RS.skey+"/"+RS.fmt+"/"+RS.tpl+"/"+RS.ch;
+function resClose(){if(ED&&ED.kind==="res")ED=null;RS=null;const m=$("#resmodal");if(m)m.remove();document.body.classList.remove("resopen")}
+async function resEdit(){const k=resKey();const saved=await edGet(k);ED={kind:"res",i:0,key:k,doc:saved?JSON.parse(JSON.stringify(saved)):resTemplate(RS.R,RS.fmt,RS.tpl,RS.ch),sel:null,hist:[],fut:[]};renderResStudio()}
+function renderResStudio(){if(!RS)return;let m=$("#resmodal");if(!m){m=document.createElement("div");m.id="resmodal";m.className="resmodal";m.setAttribute("role","dialog");m.setAttribute("aria-modal","true");document.body.appendChild(m);document.body.classList.add("resopen")}
+  const R=RS.R,editing=ED&&ED.kind==="res";
+  let h='<div class="resbox"><div class="reshead"><div><span class="label">Infografía de la investigación</span><h3>'+esc(RS.label)+'</h3></div><button class="btn" data-resclose aria-label="Cerrar">✕ Cerrar</button></div>'+
+   '<div class="ictl"><div class="seg2" role="group" aria-label="Formato">'+IFMT.map(f=>'<button data-rfmt="'+f[0]+'" aria-pressed="'+(RS.fmt===f[0])+'">'+esc(f[1])+"</button>").join("")+'</div>'+
+   '<div class="seg2" role="group" aria-label="Tema de color"><button data-rtheme="dark" aria-pressed="'+(infoTheme==="dark")+'">Oscuro</button><button data-rtheme="light" aria-pressed="'+(infoTheme==="light")+'">Claro</button></div></div>'+
+   '<p class="ikhint">Tipo de infografía</p><div class="seg2 ikinds">'+RTPL.map(k=>'<button data-rtpl="'+k[0]+'" aria-pressed="'+(RS.tpl===k[0])+'"'+(rtplOK(R,k[0])?"":' disabled title="No hay datos suficientes para este tipo"')+">"+esc(k[1])+"</button>").join("")+"</div>"+
+   (R.charts.length?'<p class="ikhint">Gráfica con los datos de la investigación</p><div class="seg2 ikinds">'+R.charts.map((c,i)=>'<button data-rch="'+i+'" aria-pressed="'+(RS.ch===i)+'">'+esc(c.title)+"</button>").join("")+"</div>":'<p class="note">Esta ficha no tiene cifras para graficar; puedes agregar una gráfica propia en el editor.</p>');
+  if(editing)h+=editorHTML();
+  else h+='<div class="iwrap"><canvas id="rescv" role="img" aria-label="Infografía: '+esc(R.title)+'"></canvas></div><div class="desk-actions"><button class="btn primary" data-resdl>Descargar PNG</button>'+(PUB?"":'<button class="btn" data-resedit>✎ Editar el diseño</button>')+'<span class="note">'+(edMem[resKey()]?"Diseño editado por ti. Revisa que cada dato siga siendo fiel a la investigación.":"Datos tomados de la investigación del radar, con sus fuentes al pie.")+"</span></div>";
+  m.innerHTML=h+"</div>";
+  if(editing)edMount();else (async()=>{const cv=$("#rescv");if(!cv)return;const sd=await edGet(resKey());await drawDoc(cv,sd||resTemplate(R,RS.fmt,RS.tpl,RS.ch));const n=m.querySelector(".desk-actions .note");if(n&&sd)n.textContent="Diseño editado por ti. Revisa que cada dato siga siendo fiel a la investigación."})()}
+function edRerender(){if(ED&&ED.kind==="res"||(!ED&&RS&&$("#resmodal")))renderResStudio();else renderDesk()}
+document.addEventListener("click",e=>{
+  const o=e.target.closest("[data-resopen]");if(o){let f=null;try{const d=JSON.parse(o.dataset.resopen||"null");if(d)f=resFocusFromBtn(d)}catch(_){}resOpen(f);return}
+  if(!RS||!e.target.closest("#resmodal"))return;
+  if(e.target.closest("[data-resclose]")||e.target.id==="resmodal"){resClose();return}
+  const f=e.target.closest("[data-rfmt]");if(f){RS.fmt=f.dataset.rfmt;if(ED)resEdit();else renderResStudio();return}
+  const th=e.target.closest("[data-rtheme]");if(th){infoTheme=th.dataset.rtheme;store.set("radar-itheme",infoTheme);if(ED)resEdit();else renderResStudio();return}
+  const tp=e.target.closest("[data-rtpl]");if(tp&&!tp.disabled){RS.tpl=tp.dataset.rtpl;if(ED)resEdit();else renderResStudio();return}
+  const c=e.target.closest("[data-rch]");if(c){RS.ch=+c.dataset.rch;if(ED)resEdit();else renderResStudio();return}
+  if(e.target.closest("[data-resedit]")){resEdit();return}
+  if(e.target.closest("[data-resdl]")){const cv=$("#rescv");if(cv)saveCanvas(cv,"radar-investigacion-"+slug(RS.label)+"-"+RS.fmt+".png");return}
+  const ac=e.target.closest("[data-edaddchart]");if(ac&&ED){const ch=RS.R.charts[+ac.dataset.edaddchart];if(ch){const D=ED.doc;edAdd("chart",{name:"Gráfica: "+ch.title,kind:ch.kind,data:ch.data.map(d=>Object.assign({},d)),unit:ch.unit||"",x:D.W*0.1,y:D.H*0.45,w:D.W*0.8,h:D.H*0.32,size:Math.round(D.W/40)})}return}
+});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&RS&&!(ED&&document.activeElement&&document.activeElement.closest&&document.activeElement.closest(".editor")))resClose()});
 function igTemplate(t,i){const sl=(t.ig&&t.ig.slides)||[];const s=sl[i]||{title:"",body:""};const W=1080,H=1350,pad=90;const L=[];const add=o=>{o.id=eid();L.push(o);return o};const N=sl.length;
   add({type:"glow",name:"Brillo de fondo",x:W*0.3,y:-H*0.5,w:W*1.6,h:W*1.6,color:i===0?"ht":"ac",alpha:0.18});
   add({type:"text",name:"Antetítulo",text:"Radar Tecnopolítico · "+(t.category||""),upper:true,font:"mono",weight:500,size:24,color:"ac",x:pad,y:pad,w:W-2*pad-150,h:32});
@@ -2239,7 +2409,7 @@ let ED=null; /* {kind,i,key,doc,sel,hist,fut} */
 const edKeyFor=(t,kind,i)=>kind==="info"?ikey(t):"ig/"+gk(t)+"/"+i;
 async function edStart(kind,i){const t=currentTopic();if(!t)return;const key=edKeyFor(t,kind,i);const saved=await edGet(key);
   ED={tkey:gk(t),kind,i,key,doc:saved?JSON.parse(JSON.stringify(saved)):(kind==="info"?(effKind(t)!=="datos"?infoKindTemplate(t,infoFmt,effKind(t)):infoTemplate(t,infoFmt)):igTemplate(t,i)),sel:null,hist:[],fut:[]};renderDesk()}
-function edClose(){ED=null;renderDesk()}
+function edClose(){const r=ED&&ED.kind==="res";ED=null;if(r)renderResStudio();else renderDesk()}
 function edSnap(){if(!ED)return;ED.hist.push(JSON.stringify(ED.doc));if(ED.hist.length>60)ED.hist.shift();ED.fut=[]}
 let edSaveH=null;function edSave(){if(!ED)return;clearTimeout(edSaveH);const k=ED.key,d=JSON.parse(JSON.stringify(ED.doc));edSaveH=setTimeout(()=>edPut(k,d),250)}
 let edRaf=0;function edRedraw(){if(edRaf)return;edRaf=requestAnimationFrame(async()=>{edRaf=0;const cv=$("#edcv");if(cv&&ED)await drawDoc(cv,ED.doc);edOverlay()})}
@@ -2261,16 +2431,17 @@ function edPropsHTML(){const L=selL();const D=ED.doc;
   else if(L.type==="list"){h+='<label class="label">Datos (uno por línea)</label><textarea id="edtxt" rows="6" data-edp="items">'+esc((L.items||[]).join("\n"))+'</textarea><div class="edrow"><label>Tamaño <input type="range" min="12" max="60" value="'+(L.size||26)+'" data-edp="size" data-num></label></div><div class="label">Color del texto</div>'+colorSel("color",L.color)+'<div class="label">Color de los números</div>'+colorSel("bullet",L.bullet)}
   else if(L.type==="rect"||L.type==="ellipse"){h+='<div class="label">Relleno</div>'+colorSel("fill",L.fill)+'<div class="label">Borde</div>'+colorSel("stroke",L.stroke)+'<div class="edrow"><label>Grosor <input type="range" min="0" max="20" value="'+(L.sw||0)+'" data-edp="sw" data-num></label>'+(L.type==="rect"?'<label>Esquinas <input type="range" min="0" max="200" value="'+(L.r||0)+'" data-edp="r" data-num></label>':"")+"</div>"}
   else if(L.type==="line"){h+='<div class="label">Color</div>'+colorSel("color",L.color)}
+  else if(L.type==="chart"){h+='<div class="label">Tipo de gráfica</div><div class="edrow wrap">'+Object.keys(CHK).map(k=>'<button class="btn csmall'+((L.kind||"hbar")===k?" primary":"")+'" data-edset="kind" data-v="'+k+'">'+CHK[k]+"</button>").join("")+'</div><label class="label">Datos (uno por línea: «Etiqueta: valor»)</label><textarea id="edtxt" rows="6" data-edp="data">'+esc(chartTxt(L))+'</textarea><p class="note">Usa solo cifras verificadas y cita la fuente en la pieza.</p><div class="edrow"><label>Unidad <input data-edp="unit" value="'+esc(L.unit||"")+'" size="6" placeholder="%, t…"></label><label>Tamaño de letra <input type="range" min="10" max="60" value="'+(L.size||26)+'" data-edp="size" data-num></label></div><div class="label">Color de las barras</div>'+colorSel("color",L.color)+'<div class="label">Color del texto</div>'+colorSel("tc",L.tc)}
   else if(L.type==="heat"){h+='<div class="edrow"><label>Nivel <input type="range" min="1" max="5" value="'+(L.level||1)+'" data-edp="level" data-num></label></div><div class="label">Color</div>'+colorSel("on",L.on)}
   else if(L.type==="image"){h+='<div class="label">Estilo de ilustración</div><div class="edrow wrap">'+Object.keys(ESTY).map(k=>'<button class="btn csmall'+((L.style||"none")===k?" primary":"")+'" data-edset="style" data-v="'+k+'">'+ESTY[k]+"</button>").join("")+'</div><div class="edrow"><button class="btn csmall'+(L.fit==="cover"?" primary":"")+'" data-edtog="cover">Recortar para llenar</button><label class="btn csmall" style="cursor:pointer">Reemplazar imagen<input type="file" accept="image/*" data-edreplace hidden></label></div>'}
   if(L.type!=="glow")h+='<div class="edrow"><label>Opacidad <input type="range" min="5" max="100" value="'+Math.round((L.op==null?1:L.op)*100)+'" data-edp="op" data-pct></label><label>Giro <input type="range" min="-180" max="180" value="'+(L.rot||0)+'" data-edp="rot" data-num></label></div>';
   return h}
 function editorHTML(){const D=ED.doc;
   return '<div class="editor"><div class="edtop"><div class="edbar">'+
-    '<button class="btn csmall" data-edadd="text">＋ Texto</button><button class="btn csmall" data-edadd="rect">＋ Rectángulo</button><button class="btn csmall" data-edadd="ellipse">＋ Círculo</button><button class="btn csmall" data-edadd="blob">＋ Mancha de acuarela</button>'+
+    '<button class="btn csmall" data-edadd="text">＋ Texto</button><button class="btn csmall" data-edadd="rect">＋ Rectángulo</button><button class="btn csmall" data-edadd="ellipse">＋ Círculo</button><button class="btn csmall" data-edadd="blob">＋ Mancha de acuarela</button><button class="btn csmall" data-edadd="chart">＋ Gráfica</button>'+
     '<label class="btn csmall" style="cursor:pointer">＋ Imagen<input type="file" accept="image/*" data-edupload hidden></label>'+(sampleState!=="off"?'<button class="btn csmall" data-edill>＋ Ilustración con Claude</button>':"")+
     '<span style="flex:1"></span><button class="btn csmall" data-edact="undo" title="Deshacer">↶</button><button class="btn csmall" data-edact="redo" title="Rehacer">↷</button></div>'+
-    '<div class="edpals"><span class="label">Paleta</span>'+Object.keys(PALS).map(k=>'<button class="edpal'+(D.pal===k?" on":"")+'" data-edpal="'+k+'" title="'+esc(PALS[k].n)+'"><i style="background:'+PALS[k].c.bg+'"></i><i style="background:'+PALS[k].c.ac+'"></i><i style="background:'+PALS[k].c.ht+'"></i><span>'+esc(PALS[k].n)+"</span></button>").join("")+"</div>"+
+    (ED.kind==="res"&&RS&&RS.R.charts.length?'<div class="edbar"><span class="label">Gráficas de la investigación</span>'+RS.R.charts.map((c,i)=>'<button class="btn csmall" data-edaddchart="'+i+'">＋ '+esc(c.title)+"</button>").join("")+"</div>":"")+'<div class="edpals"><span class="label">Paleta</span>'+Object.keys(PALS).map(k=>'<button class="edpal'+(D.pal===k?" on":"")+'" data-edpal="'+k+'" title="'+esc(PALS[k].n)+'"><i style="background:'+PALS[k].c.bg+'"></i><i style="background:'+PALS[k].c.ac+'"></i><i style="background:'+PALS[k].c.ht+'"></i><span>'+esc(PALS[k].n)+"</span></button>").join("")+"</div>"+
     '<div id="edillform" class="edill" hidden><input id="edilltxt" placeholder="¿Qué ilustración? Ej.: un cable submarino entre dos continentes"><select id="edillsty">'+Object.keys(ESTY).map(k=>'<option value="'+k+'"'+(k==="acuarela"?" selected":"")+">"+ESTY[k]+"</option>").join("")+'</select><button class="btn csmall primary" data-edillgo>Crear</button><span class="note" id="edillst"></span></div></div>'+
     '<div class="edmain"><div class="edstage" id="edstage" tabindex="0" style="aspect-ratio:'+D.W+"/"+D.H+'"><canvas id="edcv"></canvas><div class="edov" id="edov"></div></div><div class="edside" id="edprops"></div></div>'+
     '<div class="desk-actions"><button class="btn primary" data-eddl>Descargar PNG</button><button class="btn" data-edclose>Listo</button><button class="linkbtn" data-edreset>Volver a la plantilla del radar</button><span class="note">Los cambios se guardan solos en este navegador.</span></div>'+
@@ -2305,6 +2476,7 @@ function edAdd(kind,extra){const D=ED.doc;edSnap();const W=D.W,H=D.H;let L;
   else if(kind==="rect")L={type:"rect",name:"Rectángulo",fill:"bg2",stroke:"ln",sw:2,r:18,x:W*0.25,y:H*0.35,w:W*0.5,h:H*0.2};
   else if(kind==="ellipse")L={type:"ellipse",name:"Círculo",fill:"ac",stroke:"none",sw:0,x:W*0.35,y:H*0.35,w:W*0.3,h:W*0.3,op:0.85};
   else if(kind==="blob")L={type:"image",name:"Mancha de acuarela",svg:blobSvg(ecol(D,["ac","ht","ok"][Math.floor(Math.random()*3)])),style:"acuarela",x:W*0.55,y:H*0.05,w:W*0.4,h:W*0.4,op:0.9};
+  else if(kind==="chart")L=Object.assign({type:"chart",name:"Gráfica",kind:"hbar",data:[{label:"Dato A (reemplázalo)",value:3},{label:"Dato B (reemplázalo)",value:2}],unit:"",color:"ac",tc:"fg",size:Math.round(W/40),x:W*0.1,y:H*0.45,w:W*0.8,h:H*0.3},extra);
   else if(kind==="image")L=Object.assign({type:"image",name:"Imagen",style:"none",x:W*0.2,y:H*0.2,w:W*0.6,h:W*0.6},extra);
   L.id=eid();L.x=Math.round(L.x);L.y=Math.round(L.y);L.w=Math.round(L.w);L.h=Math.round(L.h);D.layers.push(L);ED.sel=L.id;edRedraw();edPanel();edSave()}
 function readImg(file,cb){if(!file)return;if(file.size>8e6){toast("La imagen pesa más de 8 MB.");return}const rd=new FileReader();rd.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,1400/Math.max(im.width,im.height));const c=document.createElement("canvas");c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext("2d").drawImage(im,0,0,c.width,c.height);cb(file.type==="image/jpeg"?c.toDataURL("image/jpeg",0.88):c.toDataURL("image/png"),c.width,c.height)};im.src=rd.result};rd.readAsDataURL(file)}
@@ -2317,13 +2489,15 @@ document.addEventListener("click",e=>{if(!ED||!e.target.closest(".editor"))retur
   const tg=e.target.closest("[data-edtog]");if(tg){const L=selL();if(!L)return;edSnap();const k=tg.dataset.edtog;if(k==="bold")L.weight=(L.weight||400)>=700?400:800;else if(k==="cover")L.fit=L.fit==="cover"?"contain":"cover";else L[k]=!L[k];edRedraw();edPanel();edSave();return}
   if(e.target.closest("[data-edill]")){const f=$("#edillform");if(f){f.hidden=!f.hidden;if(!f.hidden)$("#edilltxt").focus()}return}
   if(e.target.closest("[data-edillgo]")){edIllus();return}
+  if(e.target.closest("[data-eddl]")&&ED.kind==="res"){const cv=$("#edcv");if(cv)saveCanvas(cv,"radar-investigacion-"+slug(RS.label)+"-"+RS.fmt+".png");return}
+  if(e.target.closest("[data-edreset]")&&ED.kind==="res"){edSnap();ED.doc=resTemplate(RS.R,RS.fmt,RS.tpl,RS.ch);ED.sel=null;edPut(ED.key,null);renderResStudio();return}
   if(e.target.closest("[data-eddl]")){const cv=$("#edcv");const t=currentTopic();if(cv&&t)saveCanvas(cv,"radar-"+slug(t._oid||t.id)+"-"+(ED.kind==="info"?infoFmt:"ig-"+(ED.i+1))+".png");return}
   if(e.target.closest("[data-edclose]")){edClose();return}
   if(e.target.closest("[data-edreset]")){const t=currentTopic();if(!t)return;edSnap();ED.doc=ED.kind==="info"?infoTemplate(t,infoFmt):igTemplate(t,ED.i);ED.sel=null;edPut(ED.key,null);edRedraw();edPanel();renderDesk();return}
 });
 document.addEventListener("input",e=>{if(!ED)return;const el=e.target.closest&&e.target.closest("[data-edp]");if(!el||!el.closest(".editor"))return;const L=selL();if(!L)return;
   if(!el._snap){edSnap();el._snap=1;el.addEventListener("change",()=>{el._snap=0},{once:true});el.addEventListener("blur",()=>{el._snap=0},{once:true})}
-  const p=el.dataset.edp;let v=el.value;if(el.hasAttribute("data-num"))v=+v;if(el.hasAttribute("data-pct"))v=+v/100;if(p==="items")v=String(el.value).split("\n").map(x=>x.trim()).filter(Boolean);
+  const p=el.dataset.edp;let v=el.value;if(el.hasAttribute("data-num"))v=+v;if(el.hasAttribute("data-pct"))v=+v/100;if(p==="items")v=String(el.value).split("\n").map(x=>x.trim()).filter(Boolean);if(p==="data")v=parseChartData(el.value);
   L[p]=v;edRedraw();edSave();if(el.type==="color")edPanelLater()});
 let edPH=null;function edPanelLater(){clearTimeout(edPH);edPH=setTimeout(edPanel,400)}
 document.addEventListener("change",e=>{if(!ED)return;const up=e.target.closest&&e.target.closest("[data-edupload]");if(up&&up.files[0]){readImg(up.files[0],(src,w,h)=>{const D=ED.doc;const k=Math.min(D.W*0.6/w,D.H*0.6/h);edAdd("image",{src,name:"Imagen",w:w*k,h:h*k,x:(D.W-w*k)/2,y:(D.H-h*k)/2})});return}
@@ -2335,7 +2509,7 @@ async function saveCanvas(cv,name){const blob=await new Promise(r=>cv.toBlob(r,"
 
 /* ---------- ilustraciones con Claude ---------- */
 const ILLSTY={acuarela:"acuarela: manchas superpuestas y translúcidas (fill-opacity 0.4–0.8), bordes orgánicos, sin trazos negros, colores suaves",lapiz:"dibujo a lápiz: trazos finos (stroke) sin relleno o con rellenos muy suaves, líneas de sombreado",grabado:"grabado: alto contraste, sombreado con líneas paralelas, tonos oscuros",riso:"risografía: dos o tres tintas planas superpuestas, formas simples",plano:"ilustración plana moderna: formas geométricas limpias, colores planos",none:"ilustración plana sencilla"};
-async function edIllus(){const txt=($("#edilltxt")||{}).value||"";const sty=($("#edillsty")||{}).value||"acuarela";const stl=$("#edillst");const t=currentTopic();
+async function edIllus(){const txt=($("#edilltxt")||{}).value||"";const sty=($("#edillsty")||{}).value||"acuarela";const stl=$("#edillst");const t=ED&&ED.kind==="res"&&RS?{title:RS.R.title}:currentTopic();
   if(!txt.trim()||!sample){if(stl)stl.textContent="Describe la ilustración.";return}
   if(stl)stl.textContent="Dibujando…";
   const P=(PALS[ED.doc.pal]||PALS.noche).c;
@@ -2357,29 +2531,32 @@ const stripOps=s=>String(s||"").replace(/```ops[\s\S]*?(```|$)/g,"").trim();
 function afterEdChat(){const ta=$("#edchat-in");if(!ta)return;const m=$("#edmsgs");if(m)m.scrollTop=m.scrollHeight;ta.addEventListener("input",()=>{edDraft=ta.value});
   ta.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();edSend(ta.value)}});$("#edcomposer").addEventListener("submit",e=>{e.preventDefault();edSend(ta.value)});$("#edstop").addEventListener("click",()=>edCtl&&edCtl.abort());
   if(edBusy){$("#edsend").disabled=true;$("#edstop").hidden=false;$("#edlive").hidden=false}}
-document.addEventListener("click",e=>{const q=e.target.closest("[data-edq]");if(q){edSend(q.dataset.edq);return}if(e.target.closest("[data-edclear]")){try{localStorage.removeItem(edChatKey())}catch(_){}renderDesk()}});
+document.addEventListener("click",e=>{const q=e.target.closest("[data-edq]");if(q){edSend(q.dataset.edq);return}if(e.target.closest("[data-edclear]")){try{localStorage.removeItem(edChatKey())}catch(_){}edRerender()}});
 function edDocForClaude(){return {ancho:ED.doc.W,alto:ED.doc.H,paleta:ED.doc.pal,colores_propios:ED.doc.colors,seleccionado:ED.sel,capas:ED.doc.layers.map(L=>{const o=Object.assign({},L);if(o.src)o.src="[imagen subida por Lucy]";if(o.svg)o.svg="[ilustración SVG]";return o})}}
 function edRules(t){const ficha={titulo:t.title,gancho:t.hook,datos:(t.facts||[]).map(f=>f.text),cifra_sugerida:t.infographic&&t.infographic.stat||null,verificar:t.ami&&t.ami.check||[],fuentes:(t.sources||[]).map(s=>outletShort(s)),carrusel:(t.ig&&t.ig.slides)||[]};
   return "Eres el diseñador del Radar Tecnopolítico de Lucy (periodista colombiana, enfoque de alfabetización mediática). Editas la pieza de abajo ("+(ED.kind==="info"?"infografía":"diapositiva "+(ED.i+1)+" del carrusel de Instagram")+") según lo que ella pida.\n\n"+
   "CÓMO RESPONDER\n- En español, en una o dos frases, di qué cambiaste.\n- Incluye un único bloque ```ops ... ``` con una lista JSON de operaciones:\n  {\"op\":\"update\",\"id\":\"<id>\",\"set\":{...campos...}} · {\"op\":\"add\",\"layer\":{...}} · {\"op\":\"remove\",\"id\":\"<id>\"} · {\"op\":\"palette\",\"name\":\"<"+Object.keys(PALS).join("|")+">\"} · {\"op\":\"order\",\"id\":\"<id>\",\"to\":\"front|back\"}.\n- Tipos de capa y campos: text {text,font:disp|body|mono|serif,size,weight,italic,upper,align,color,bgc,bar,lh,x,y,w,h}; list {items,size,color,bullet}; rect/ellipse {fill,stroke,sw,r}; line {color}; heat {level}; image {svg,style:acuarela|lapiz|grabado|riso|plano|none,fit}. Todas tienen x,y,w,h (en píxeles del lienzo), op (0 a 1), rot (grados).\n- Colores: usa los nombres de la paleta (bg, bg2, fg, mu, ac, ht, ln, ok) o un hexadecimal.\n- Para una ilustración nueva agrega una capa image con svg: original, sin texto, sin scripts ni imágenes externas, con viewBox, menos de 8.000 caracteres; style indica el acabado (acuarela, lápiz, etc.). Nada de logotipos, marcas, personajes conocidos ni personas reales.\n- Mantén todo dentro del lienzo y legible.\n\nREGLAS DE VERACIDAD\n- Todo dato o cifra sale de la FICHA. Puedes resumir o reformular, nunca agregar hechos, cifras ni fuentes. Si piden algo que no está, explícalo y no lo pongas. La línea de fuentes se mantiene.\n\nFICHA (JSON)\n"+JSON.stringify(ficha)+"\n\nPIEZA ACTUAL (JSON)\n"+JSON.stringify(edDocForClaude())}
+function edRulesRes(){const base=edRules({title:RS.R.title,facts:[],sources:[]});const i=base.indexOf("REGLAS DE VERACIDAD");let ctxs=JSON.stringify(RS.ctx);if(ctxs.length>14000)ctxs=ctxs.slice(0,14000)+"…";
+  return base.slice(0,i).replace("(infografía)","(infografía de la investigación: "+RS.label+")").replace("image {svg,","chart {kind:hbar|bar|donut|line,data:[{label,value,c?}],unit,color,tc,size} (gráfica: usa datos de la INVESTIGACIÓN; c es un color de la paleta para esa barra o porción); image {svg,")+
+  "REGLAS DE VERACIDAD\n- Todo dato, cifra o gráfica sale de la INVESTIGACIÓN de abajo. Puedes elegir, ordenar, resumir y graficar esos datos (y calcular sumas o porcentajes simples, diciendo que son cálculo del radar), nunca agregar hechos, cifras ni fuentes. Si piden algo que no está, explícalo y no lo pongas. Respeta la confianza: si un dato es de confianza baja, indícalo en la pieza. La línea de fuentes se mantiene.\n\nGRÁFICAS YA PREPARADAS (JSON)\n"+JSON.stringify(RS.R.charts)+"\n\nINVESTIGACIÓN (JSON)\n"+ctxs+"\n\nPIEZA ACTUAL (JSON)\n"+JSON.stringify(edDocForClaude())}
 function lastOps(text){const m=[...String(text).matchAll(/```ops\s*([\s\S]*?)```/g)];if(!m.length)return null;const raw=m[m.length-1][1];try{return JSON.parse(raw)}catch(_){const a=raw.indexOf("["),b=raw.lastIndexOf("]");try{return a>=0?JSON.parse(raw.slice(a,b+1)):null}catch(__){return null}}}
-const ED_OK=["text","font","size","weight","italic","upper","align","color","bgc","bar","lh","x","y","w","h","op","rot","items","bullet","fill","stroke","sw","r","level","on","style","fit","name","hide","pad"];
+const ED_OK=["kind","data","unit","tc","text","font","size","weight","italic","upper","align","color","bgc","bar","lh","x","y","w","h","op","rot","items","bullet","fill","stroke","sw","r","level","on","style","fit","name","hide","pad"];
 function applyOps(ops){if(!Array.isArray(ops))return 0;const D=ED.doc;let n=0;
   ops.forEach(o=>{try{if(o.op==="palette"&&PALS[o.name]){D.pal=o.name;D.colors={};n++}
     else if(o.op==="remove"){const i=D.layers.findIndex(l=>l.id===o.id);if(i>=0){D.layers.splice(i,1);n++}}
     else if(o.op==="order"){const i=D.layers.findIndex(l=>l.id===o.id);if(i>=0){const L=D.layers.splice(i,1)[0];if(o.to==="back")D.layers.splice(1,0,L);else D.layers.push(L);n++}}
     else if(o.op==="update"){const L=D.layers.find(l=>l.id===o.id);if(L&&o.set){Object.keys(o.set).forEach(k=>{if(ED_OK.includes(k))L[k]=o.set[k]});if(o.set.svg){const sv=cleanSvg(o.set.svg);if(sv){L.svg=sv;delete L.src}}n++}}
-    else if(o.op==="add"&&o.layer&&["text","list","rect","ellipse","line","heat","image"].includes(o.layer.type)){const L={type:o.layer.type,id:eid()};ED_OK.forEach(k=>{if(o.layer[k]!==undefined)L[k]=o.layer[k]});
+    else if(o.op==="add"&&o.layer&&["text","list","rect","ellipse","line","heat","image","chart"].includes(o.layer.type)){const L={type:o.layer.type,id:eid()};ED_OK.forEach(k=>{if(o.layer[k]!==undefined)L[k]=o.layer[k]});
       if(L.type==="image"){const sv=cleanSvg(o.layer.svg);if(!sv)return;L.svg=sv;L.style=L.style||"none"}["x","y","w","h"].forEach(k=>{L[k]=Math.round(+L[k]||0)});if(!L.w)L.w=D.W*0.4;if(!L.h)L.h=D.H*0.2;D.layers.push(L);n++}}catch(_){}});
   return n}
-async function edSend(text){text=String(text||"").trim();const t=currentTopic();if(!text||edBusy||!t||!sample||!ED)return;const k=edChatKey();
-  const msgs=store.get(k)||[];msgs.push({role:"user",content:text});store.set(k,msgs.slice(-20));edDraft="";edBusy=true;renderDesk();edCtl=new AbortController();
-  const turns=[{role:"user",content:edRules(t)},{role:"assistant",content:"Entendido. Responderé con un bloque ops."}].concat(msgs.slice(-8));
+async function edSend(text){text=String(text||"").trim();const t=ED&&ED.kind==="res"?null:currentTopic();if(!text||edBusy||(!t&&!(ED&&ED.kind==="res"))||!sample||!ED)return;const k=edChatKey();
+  const msgs=store.get(k)||[];msgs.push({role:"user",content:text});store.set(k,msgs.slice(-20));edDraft="";edBusy=true;edRerender();edCtl=new AbortController();
+  const turns=[{role:"user",content:ED.kind==="res"?edRulesRes():edRules(t)},{role:"assistant",content:"Entendido. Responderé con un bloque ops."}].concat(msgs.slice(-8));
   try{const r=await sample(turns,{cache:false,signal:edCtl.signal,onText:({text})=>{const b=$("#edlive-body");if(b){b.classList.remove("typing");b.innerHTML=fmtBot(stripOps(text))||"Diseñando…"}}});
     const ops=lastOps(r.text);let note=r.text;if(ops){edSnap();const n=applyOps(ops);if(!n){ED.hist.pop();note=stripOps(r.text)+"\n\n⚠️ No pude aplicar los cambios. Pídelo de otra forma."}else edSave()}
     const all=store.get(k)||[];all.push({role:"assistant",content:note});store.set(k,all.slice(-20))}
   catch(e){const all=store.get(k)||[];all.push({role:"assistant",content:"⚠️ "+(ERR[e&&e.code]||"No pude responder ahora.")});store.set(k,all.slice(-20))}
-  finally{edBusy=false;edCtl=null;if(ED)renderDesk()}}
+  finally{edBusy=false;edCtl=null;if(ED)edRerender()}}
 
 /* ---------- carrusel de Instagram: miniaturas ---------- */
 function igDesignHTML(t){const sl=(t.ig&&t.ig.slides)||[];if(!sl.length||PUB)return "";
