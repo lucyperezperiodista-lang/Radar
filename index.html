@@ -1778,7 +1778,7 @@ function findStat(t){const ig=t.infographic&&t.infographic.stat;if(ig&&ig.value)
   const RE=/(US\$|\$|€|£)?\s?(\d{1,3}(?:[.,]\d{3})+|\d+(?:[.,]\d+)?)\s?(%|por ciento|mil millones|millones|millón|billones|mil\b|M\b)?/g;
   for(const f of t.facts||[]){const s=String(f.text);let m;RE.lastIndex=0;
     while((m=RE.exec(s))){const after=s.slice(m.index+m[0].length);const num=parseFloat(m[2].replace(/[.,](?=\d{3}\b)/g,"").replace(",","."));
-      if(MON.test(after))continue;if(!m[1]&&!m[3]&&num>=1900&&num<=2100)continue;
+      if(MON.test(after))continue;if(!m[1]&&!m[3]&&num>=1900&&num<=2100)continue;if(!m[1]&&!m[3]&&/(contrato|ley|decreto|resoluci[oó]n|art[ií]culo|expediente|radicado|sentencia|proceso|caso|n[uú]mero|n\.?\s?º|no\.|#)\s*(de\s+aporte)?\s*(n\.?\s?º|no\.)?\s*$/i.test(s.slice(0,m.index)))continue;
       if(m[1]||m[3]||num>=100||/^\s*(personas|periodistas|casos|videos|cuentas|países|municipios|usuarios|millones)/i.test(after)){
         let v=(m[1]||"")+m[2]+(m[3]?(m[3]==="por ciento"?"%":(m[3]==="%"?"%":" "+m[3])):"");return {value:v.trim(),label:s,src:f.src}}}}
   return null}
@@ -1786,7 +1786,7 @@ async function drawInfo(t){const cv=$("#infocv");if(!cv)return;const sd=await ed
   try{await document.fonts.ready}catch(_){}
   const ctx=cv.getContext("2d");ctx.textBaseline="top";const D=infoTheme==="dark";
   const C=Object.assign(D?{bg:"#0D121C",bg2:"#151C2A",fg:"#E6EAF2",mu:"#98A3B7",ac:"#8C9CFF",ht:"#FF7A5C",ln:"#2A3448",ok:"#4FD1A5"}:{bg:"#F6F7FA",bg2:"#FFFFFF",fg:"#111827",mu:"#566275",ac:"#2B44D6",ht:"#D9482B",ln:"#D3DAE4",ok:"#11795B"},safeColors(SP.colors));
-  const wide=W>H, S=Math.min(W/1080,H/1000), pad=Math.round((wide?64:80)*S), px=n=>Math.round(n*S);
+  const wide=W>=H, S=Math.min(W/1080,H/1000), pad=Math.round((wide?64:80)*S), px=n=>Math.round(n*S);
   const DISP='"Bricolage Grotesque","Segoe UI",sans-serif',BODY='"IBM Plex Sans",system-ui,sans-serif',MONO='"IBM Plex Mono",monospace';
   ctx.fillStyle=C.bg;ctx.fillRect(0,0,W,H);const ILL=await loadIllus(SP.illus);if(ILL&&SP.illus.pos==="bg"){ctx.save();ctx.globalAlpha=Math.min(.35,Math.max(.05,+SP.illus.opacity||.14));const sc=Math.max(W/ILL.width,H/ILL.height);ctx.drawImage(ILL,(W-ILL.width*sc)/2,(H-ILL.height*sc)/2,ILL.width*sc,ILL.height*sc);ctx.restore()}
   const g=ctx.createRadialGradient(W*0.85,H*0.08,10,W*0.85,H*0.08,Math.max(W,H)*0.8);g.addColorStop(0,D?"rgba(140,156,255,.20)":"rgba(43,68,214,.10)");g.addColorStop(1,"rgba(0,0,0,0)");ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
@@ -1804,8 +1804,8 @@ async function drawInfo(t){const cv=$("#infocv");if(!cv)return;const sd=await ed
   ctx.fillStyle=C.fg;ctx.font="600 "+px(21)+"px "+BODY;ctx.textAlign="right";ctx.fillText("Fundación Casa del Bosque",W-pad,fy+px(21));ctx.textAlign="left";
   const bottom=fy-px(28);
   /* columna del título */
-  let colW=wide?Math.round(W*0.52)-pad:W-2*pad;const illTR=ILL&&SP.illus.pos!=="bg";const iw=illTR?Math.round((wide?0.2:0.3)*W):0;if(illTR&&!wide){const ih=Math.round(iw*ILL.height/ILL.width);drawFit(ctx,ILL,W-pad-iw,y,iw,Math.min(ih,iw*1.2));colW-=iw+px(24)}
-  let ts=wide?62:76,tl,maxL=wide?4:(H>W*1.5?6:4);do{ctx.font="800 "+px(ts)+"px "+DISP;tl=wrapLines(ctx,SP.title,colW);if(tl.length<=maxL)break;ts-=4}while(ts>34);
+  let colW=wide?Math.round(W*0.52)-pad-px(36):W-2*pad;const illTR=ILL&&SP.illus.pos!=="bg";const iw=illTR?Math.round((wide?0.2:0.3)*W):0;if(illTR&&!wide){const ih=Math.round(iw*ILL.height/ILL.width);drawFit(ctx,ILL,W-pad-iw,y,iw,Math.min(ih,iw*1.2));colW-=iw+px(24)}
+  let ts=wide?62:76,tl,maxL=W===H?5:(wide?4:(H>W*1.5?6:4));do{ctx.font="800 "+px(ts)+"px "+DISP;tl=wrapLines(ctx,SP.title,colW);if(tl.length<=maxL)break;ts-=4}while(ts>34);
   if(tl.length>maxL){tl=tl.slice(0,maxL);tl[maxL-1]=tl[maxL-1].replace(/\s*\S*$/,"")+"…"}
   ctx.fillStyle=C.fg;const tlh=Math.round(px(ts)*1.06);tl.forEach(l=>{ctx.fillText(l,pad,y);y+=tlh});
   y+=px(20);
@@ -1822,17 +1822,18 @@ async function drawInfo(t){const cv=$("#infocv");if(!cv)return;const sd=await ed
     ry+=bh+px(30)}
   const chk=SP.check;
   const facts=(SP.facts||[]).map(x=>typeof x==="string"?{text:x}:x).filter(f=>f&&f.text&&(!stat||f.text!==stat.label));
-  ctx.fillStyle=C.mu;ctx.font="500 "+px(20)+"px "+MONO;ctx.fillText("DATOS VERIFICADOS",rx,ry);ry+=px(38);
+  const lblY=ry;ry+=px(38);
   const fitFacts=(size,withChk)=>{ctx.font="400 "+px(size)+"px "+BODY;const lh=Math.round(px(size)*1.32);let yy=ry,out=[];
-    for(const f of facts.slice(0,5)){const fl=wrapLines(ctx,f.text,rw-px(56));const need=fl.length*lh+px(18);if(yy+need>(withChk?bottom-px(118):bottom))break;out.push({fl,lh,y:yy});yy+=need}return {out,yy}};
+    for(const f of facts.slice(0,5)){const fl=wrapLines(ctx,f.text,rw-px(56));const need=fl.length*lh+px(18);if(yy+need>(withChk?bottom-px(W===H?146:118):bottom))break;out.push({fl,lh,y:yy});yy+=need}return {out,yy}};
   let best=null;for(const withChk of chk?[true,false]:[false]){for(let sz=27;sz>=19;sz-=2){const r=fitFacts(sz,withChk);if(r.out.length>=Math.min(3,facts.length)||sz===19){if(!best||r.out.length>best.r.out.length||(r.out.length===best.r.out.length&&withChk&&!best.withChk))best={r,sz,withChk};if(r.out.length>=Math.min(3,facts.length))break}}if(best&&best.r.out.length>=Math.min(3,facts.length))break}
-  if(best){best.r.out.forEach((it,i)=>{const cy=it.y+Math.round(it.lh/2)-px(2);ctx.fillStyle=C.ac;ctx.beginPath();ctx.arc(rx+px(16),cy,px(15),0,Math.PI*2);ctx.fill();
+  if(best&&best.r.out.length){ctx.fillStyle=C.mu;ctx.font="500 "+px(20)+"px "+MONO;ctx.fillText("DATOS VERIFICADOS",rx,lblY)}else ry=lblY;
+  if(best&&best.r.out.length){best.r.out.forEach((it,i)=>{const cy=it.y+Math.round(it.lh/2)-px(2);ctx.fillStyle=C.ac;ctx.beginPath();ctx.arc(rx+px(16),cy,px(15),0,Math.PI*2);ctx.fill();
       ctx.fillStyle=C.bg;ctx.font="700 "+px(17)+"px "+MONO;ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(String(i+1),rx+px(16),cy+1);ctx.textAlign="left";ctx.textBaseline="top";
       ctx.fillStyle=C.fg;ctx.font="400 "+px(best.sz)+"px "+BODY;it.fl.forEach((l,j)=>ctx.fillText(l,rx+px(46),it.y+j*it.lh))});
     ry=best.r.yy}
-  if(chk&&best&&best.withChk){const by=Math.min(ry+px(6),bottom-px(104));ctx.strokeStyle=C.ok;ctx.lineWidth=Math.max(1,px(2));roundRect(ctx,rx,by,rw,px(100),px(14));ctx.stroke();
+  if(chk&&best&&best.withChk){const cbh=px(W===H?128:100),by=Math.min(ry+px(6),bottom-cbh-px(4));ctx.strokeStyle=C.ok;ctx.lineWidth=Math.max(1,px(2));roundRect(ctx,rx,by,rw,cbh,px(14));ctx.stroke();
     ctx.fillStyle=C.ok;ctx.font="500 "+px(18)+"px "+MONO;ctx.fillText("ANTES DE COMPARTIR",rx+px(22),by+px(16));
-    ctx.fillStyle=C.fg;ctx.font="400 "+px(21)+"px "+BODY;let cl=wrapLines(ctx,chk,rw-px(44));if(cl.length>2){cl=cl.slice(0,2);cl[1]=cl[1].replace(/\s*\S*$/,"")+"…"}cl.forEach((l,j)=>ctx.fillText(l,rx+px(22),by+px(46+j*27)))}
+    ctx.fillStyle=C.fg;ctx.font="400 "+px(21)+"px "+BODY;let cl=wrapLines(ctx,chk,rw-px(44));const cmx=W===H?3:2;if(cl.length>cmx){cl=cl.slice(0,cmx);cl[cmx-1]=cl[cmx-1].replace(/\s*\S*$/,"")+"…"}cl.forEach((l,j)=>ctx.fillText(l,rx+px(22),by+px(46+j*27)))}
 }
 function roundRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
 async function downloadInfo(t){const cv=$("#infocv");if(!cv)return;const name="radar-"+slug(t._oid||t.id)+"-"+infoFmt+".png";
@@ -2102,7 +2103,7 @@ function hexA(c,a){const m=/^#([0-9a-f]{6})/i.exec(c);if(!m)return c;const n=par
 function mctx(){const c=mctx.c||(mctx.c=document.createElement("canvas"));return c.getContext("2d")}
 function lineCount(L){const ctx=mctx();ctx.font=fontOf(L,L.size);return edWrap(ctx,L.upper?String(L.text).toUpperCase():L.text,L.w-(L.pad||0)*2).length}
 function sizeH(L,maxLines){let n=lineCount(L);while(maxLines&&n>maxLines&&L.size>14){L.size-=2;n=lineCount(L)}L.h=Math.ceil(n*L.size*(L.lh||1.25))+2;return L}
-function infoTemplate(t,fid){const F=IFMT.find(f=>f[0]===fid)||IFMT[0];const W=F[2],H=F[3];const wide=W>H,S=Math.min(W/1080,H/1000),px=n=>Math.round(n*S),pad=Math.round((wide?64:80)*S);
+function infoTemplate(t,fid){const F=IFMT.find(f=>f[0]===fid)||IFMT[0];const W=F[2],H=F[3];const wide=W>=H,S=Math.min(W/1080,H/1000),px=n=>Math.round(n*S),pad=Math.round((wide?64:80)*S);
   const D=infoTheme==="dark";const L=[];const add=o=>{o.id=eid();L.push(o);return o};
   add({type:"glow",x:W*0.85-Math.max(W,H)*0.8,y:H*0.08-Math.max(W,H)*0.8,w:Math.max(W,H)*1.6,h:Math.max(W,H)*1.6,color:"ac",alpha:D?0.2:0.1,name:"Brillo de fondo"});
   let y=pad;
@@ -2114,20 +2115,20 @@ function infoTemplate(t,fid){const F=IFMT.find(f=>f[0]===fid)||IFMT[0];const W=F
   add({type:"line",name:"Línea del pie",color:"ln",x:pad,y:fy,w:W-2*pad,h:Math.max(1,px(2))});
   add({type:"text",name:"Fuentes",text:"Fuentes: "+(t.sources||[]).slice(0,4).map(s=>outletShort(s)).join(" · "),size:px(19),color:"mu",x:pad,y:fy+px(22),w:W-2*pad-px(340),h:px(26)});
   add({type:"text",name:"Firma",text:"Fundación Casa del Bosque",weight:600,size:px(21),align:"right",color:"fg",x:W-pad-px(330),y:fy+px(21),w:px(330),h:px(28)});
-  const bottom=fy-px(28);const colW=wide?Math.round(W*0.52)-pad:W-2*pad;
-  const tt=sizeH({type:"text",name:"Título",text:t.title,font:"disp",weight:800,size:px(wide?62:76),lh:1.06,color:"fg",x:pad,y,w:colW},wide?4:(H>W*1.5?6:4));add(tt);y+=tt.h+px(20);
+  const bottom=fy-px(28);const colW=wide?Math.round(W*0.52)-pad-px(36):W-2*pad;
+  const tt=sizeH({type:"text",name:"Título",text:t.title,font:"disp",weight:800,size:px(wide?62:76),lh:1.06,color:"fg",x:pad,y,w:colW},W===H?5:(wide?4:(H>W*1.5?6:4)));add(tt);y+=tt.h+px(20);
   const hk=sizeH({type:"text",name:"Bajada",text:t.hook||"",size:px(28),lh:1.36,color:"fg",bar:"ht",x:pad,y,w:colW},wide?6:3);add(hk);y+=hk.h+px(34);
   let rx=pad,ry=y,rw=colW;if(wide){rx=Math.round(W*0.52)+px(24);ry=pad+px(92);rw=W-rx-pad}
   const st=findStat(t);
   if(st){const bh=px(176);add({type:"rect",name:"Tarjeta de la cifra",fill:"bg2",stroke:"ln",sw:Math.max(1,px(2)),r:px(18),x:rx,y:ry,w:rw,h:bh});
     add({type:"text",name:"Cifra",text:st.value,font:"disp",weight:800,size:px(88),lh:1,color:"ac",x:rx+px(26),y:ry+px(20),w:rw-px(52),h:px(90)});
-    add({type:"text",name:"Qué mide la cifra",text:st.label,size:px(20),lh:1.35,color:"mu",x:rx+px(26),y:ry+px(112),w:rw-px(52),h:px(56)});ry+=bh+px(30)}
+    add({type:"text",name:"Qué mide la cifra",text:st.label.length>120?st.label.slice(0,118).replace(/\s+\S*$/,"")+"…":st.label,size:px(20),lh:1.35,color:"mu",x:rx+px(26),y:ry+px(112),w:rw-px(52),h:px(56)});ry+=bh+px(30)}
   add({type:"text",name:"Rótulo de datos",text:"Datos verificados",upper:true,font:"mono",weight:500,size:px(20),color:"mu",x:rx,y:ry,w:rw,h:px(28)});ry+=px(38);
   const chk=t.ami&&t.ami.check&&t.ami.check[0];const facts=(t.facts||[]).filter(f=>!st||f.text!==st.label).slice(0,3).map(f=>f.text);
-  const lb=chk?bottom-px(118):bottom;add({type:"list",name:"Datos",items:facts,size:px(25),color:"fg",bullet:"ac",x:rx,y:ry,w:rw,h:Math.max(px(80),lb-ry)});
-  if(chk){const by=bottom-px(104);add({type:"rect",name:"Recuadro «antes de compartir»",fill:"none",stroke:"ok",sw:Math.max(1,px(2)),r:px(14),x:rx,y:by,w:rw,h:px(100)});
+  const cbh=px(W===H?128:100);const lb=chk?bottom-cbh-px(18):bottom;add({type:"list",name:"Datos",items:facts,size:px(25),color:"fg",bullet:"ac",x:rx,y:ry,w:rw,h:Math.max(px(80),lb-ry)});
+  if(chk){const by=bottom-cbh-px(4);add({type:"rect",name:"Recuadro «antes de compartir»",fill:"none",stroke:"ok",sw:Math.max(1,px(2)),r:px(14),x:rx,y:by,w:rw,h:cbh});
     add({type:"text",name:"Rótulo «antes de compartir»",text:"Antes de compartir",upper:true,font:"mono",weight:500,size:px(18),color:"ok",x:rx+px(22),y:by+px(16),w:rw-px(44),h:px(24)});
-    add({type:"text",name:"Consejo",text:chk,size:px(21),lh:1.3,color:"fg",x:rx+px(22),y:by+px(46),w:rw-px(44),h:px(50)})}
+    add({type:"text",name:"Consejo",text:chk,size:px(21),lh:1.3,color:"fg",x:rx+px(22),y:by+px(46),w:rw-px(44),h:cbh-px(54)})}
   return {v:1,W,H,pal:D?"noche":"papel",colors:{},bg:"bg",layers:L}}
 function igTemplate(t,i){const sl=(t.ig&&t.ig.slides)||[];const s=sl[i]||{title:"",body:""};const W=1080,H=1350,pad=90;const L=[];const add=o=>{o.id=eid();L.push(o);return o};const N=sl.length;
   add({type:"glow",name:"Brillo de fondo",x:W*0.3,y:-H*0.5,w:W*1.6,h:W*1.6,color:i===0?"ht":"ac",alpha:0.18});
