@@ -540,6 +540,18 @@ body.resopen{overflow:hidden}
 .icard .satq{background:var(--sky);color:var(--sky-ink);border-color:var(--sky-line)}.icard .satq::placeholder{color:var(--sky-muted)}
 .icard .gchip{color:var(--sky-ink)}
 .gchip.on,.icard .gchip.on,.vinfo .gchip.on,.satchips .gchip.on{background:var(--sky-ink);color:var(--sky);border-color:var(--sky-ink)}.gchip.on small,.gchip.on i{opacity:1}
+.podnav{display:flex;gap:4px;flex-wrap:wrap;margin:0 0 12px;border-bottom:1px solid var(--line)}
+.podnav button{background:none;border:0;border-bottom:2px solid transparent;padding:8px 12px;font:inherit;font-size:14px;color:var(--muted);cursor:pointer}
+.podnav button[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--accent);font-weight:600}
+.pfbar{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:flex-start}
+.pfgroup{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.pfdet{position:relative}
+.pfdet>summary{list-style:none;cursor:pointer;display:inline-flex;gap:8px;align-items:center;padding:7px 12px;border:1px solid var(--sky-line);border-radius:999px;color:var(--sky-ink);font-size:13.5px;background:var(--sky)}
+.pfdet>summary::-webkit-details-marker{display:none}.pfdet>summary b{font-weight:600}.pfdet>summary i{font-style:normal;color:var(--sky-muted)}
+.pfdet[open]>summary{border-color:var(--sky-ink)}
+.pfpanel{position:absolute;z-index:20;top:calc(100% + 6px);left:0;width:min(620px,86vw);max-height:60vh;overflow:auto;background:var(--sky-2);border:1px solid var(--sky-line);border-radius:12px;padding:12px 14px;display:grid;gap:8px;box-shadow:0 12px 30px rgba(0,0,0,.35)}
+@media (max-width:640px){.pfdet{position:static}.pfpanel{position:static;width:auto;box-shadow:none;margin-top:6px}}
+.pfnote>summary{cursor:pointer;color:var(--sky-muted);font-size:13px}.pfnote[open]>summary{margin-bottom:6px}
 .hbscroll{max-height:620px;overflow:auto;padding-right:4px}
 .hbb{background:none;border:0;padding:3px 0;width:100%;text-align:left;font:inherit;cursor:pointer;border-radius:6px}.hbb:hover .hb-l{text-decoration:underline}.hbb:focus-visible{outline:2px solid var(--accent)}
 .hbrank{color:var(--sky-muted);font-family:var(--f-mono);font-size:11px}
@@ -2879,56 +2891,95 @@ function empOf(r){return ((RES.empleados||{})[r.rank+"|"+r.company])||null}
 function lfOf(c){const L=RES.laboral||{};return L[{UVK:"XKX",WBG:"PSE"}[c.iso3]||c.iso3]||null}
 function podCos(){const F=FB();return F.top100.filter(r=>secOK(r)&&ownOK(r))}
 
+var podView=store.get("radar-podview")||"comp", podEnt=store.get("radar-podent")||["co","pa"], podOpen=null, mrN=store.get("radar-mrn")||20, mrSecs=store.get("radar-mrsecs")||[], mrQ="";
+var MRIND={"Technology":"Tecnología","Finance & Investments":"Finanzas e inversiones","Fashion & Retail":"Moda y comercio","Automotive":"Automotriz","Media & Entertainment":"Medios y entretenimiento","Food & Beverage":"Alimentos y bebidas","Diversified":"Diversificado","Energy":"Energía","Manufacturing":"Manufactura","Metals & Mining":"Metales y minería","Real Estate":"Inmobiliario","Healthcare":"Salud","Telecom":"Telecomunicaciones","Logistics":"Logística","Gambling & Casinos":"Juegos y casinos","Sports":"Deportes","Construction & Engineering":"Construcción e ingeniería","Service":"Servicios"};
+function MR2(){return RES.ricos||null}
+function mrSec(p){return MRIND[p.industry]||p.industry||"Sin dato"}
+function mrList(){const M=MR2();if(!M)return[];return M.people.filter(p=>!mrSecs.length||mrSecs.includes(mrSec(p)))}
+function pfDet(key,title,sum,body){return '<details class="pfdet" data-pfkey="'+key+'"'+(podOpen===key?" open":"")+'><summary><span class="label">'+title+'</span> <b>'+sum+'</b> <i aria-hidden="true">▾</i></summary><div class="pfpanel">'+body+"</div></details>"}
+function chipsMulti(attr,list,sel,allLabel,counts){return '<div class="satchips"><button class="gchip'+(!sel.length?" on":"")+'" data-'+attr+'="">'+allLabel+"</button>"+list.map(x=>{const v=Array.isArray(x)?x[0]:x,l=Array.isArray(x)?x[1]:x;return '<button class="gchip'+(sel.includes(v)?" on":"")+'" data-'+attr+'="'+esc(v)+'" aria-pressed="'+sel.includes(v)+'">'+esc(l)+(counts&&counts[v]!=null?" · "+counts[v]:"")+"</button>"}).join("")+"</div>"}
+function sumList(sel,all,map){if(!sel.length)return all;const n=sel.map(v=>map?map(v):v);return n.length>2?n.slice(0,2).join(", ")+" y "+(n.length-2)+" más":n.join(" y ")}
+
 function invPoderHTML(){const F=FB(),P=PIB(),W=PW();if(!F||!W)return '<p class="note">Datos en preparación.</p>';
-  let h=podPick?podFicha():"";
+  let h=podPick?podFicha():"";const M=MR2();
+  const VIEWS=[["comp","Comparación"],["pib","PIB por continente"],["tech","10 tecnológicas"],["top","100 empresas"]].concat(M?[["ricos","Personas más ricas"]]:[]);
+  h+='<div class="podnav" role="tablist" aria-label="Secciones de poder corporativo">'+VIEWS.map(([k,l])=>'<button role="tab" data-podview="'+k+'" aria-selected="'+(podView===k)+'">'+l+"</button>").join("")+"</div>";
   const pmap={};(F.profits_2025||[]).forEach(p=>{pmap[p.company.replace(/\s*\(.*\)$/,"").toLowerCase()]=p});
   const pf=c=>pmap[c.toLowerCase()]||Object.values(pmap).find(p=>p.company.toLowerCase().startsWith(c.toLowerCase().split(" ")[0]));
-  /* 1. comparación */
+  if(podView==="comp"){
   const ML={sales:"ventas",profits:"ganancias",mv:"valor de mercado",emp:"trabajadores"};const EMP=podMetric==="emp";
+  const useCo=podEnt.includes("co"),usePa=podEnt.includes("pa"),usePe=podEnt.includes("pe")&&M&&!EMP;
   const cval=r=>EMP?((empOf(r)||{}).employees):({sales:r.sales_busd,profits:r.profits_busd,mv:r.market_value_busd}[podMetric]);
   const pval=c=>EMP?((lfOf(c)||{}).v):c.gdp_busd;
-  const cos=podCos().slice(0,podN);
-  const ctry=podCountries();
-  const rows=ctry.map(c=>({l:c.name,v:pval(c),c:"#5CC8FF",note:EMP?((lfOf(c)||{}).y?"fuerza laboral "+lfOf(c).y:""):(c.year?"dato "+c.year:""),pick:"pa:"+c.iso3})).concat(cos.map(r=>({l:r.company,v:cval(r),c:"#FF7A5C",pick:"co:"+r.rank+"|"+r.company,tag:'<small class="hbrank">#'+r.rank+"</small> "}))).filter(r=>r.v!=null).sort((a,b)=>b.v-a.v);
-  const beat=cos.map(r=>({r,n:ctry.filter(c=>pval(c)!=null&&cval(r)!=null&&pval(c)<cval(r)).length}));
-  const secs=[...new Set(F.top100.map(secOf))].sort();
-  h+='<section class="icard pod"><div class="label">Comparación · toca una barra para ver su ficha y su análisis tecnopolítico</div><h4>Las empresas más grandes del mundo frente al PIB de los países</h4>'+
-    '<div class="podctl"><span class="label">Cuántas empresas</span><div class="seg2">'+[10,20,30,40,50].map(n=>'<button data-podn="'+n+'" aria-pressed="'+(podN===n)+'">'+n+"</button>").join("")+"</div>"+
-    '<span class="label">Comparar con su</span><div class="seg2"><button data-podmetric="sales" aria-pressed="'+(podMetric==="sales")+'">Ventas</button><button data-podmetric="profits" aria-pressed="'+(podMetric==="profits")+'">Ganancias</button><button data-podmetric="mv" aria-pressed="'+(podMetric==="mv")+'">Valor de mercado</button><button data-podmetric="emp" aria-pressed="'+EMP+'">Trabajadores</button></div></div>'+
-    '<div class="label">Sectores (elige uno o varios)</div><div class="satchips"><button class="gchip'+(!podSecs.length?" on":"")+'" data-podsecs="">Todos</button><button class="gchip'+(podSecs.includes("tech")?" on":"")+'" data-podsecs="tech" aria-pressed="'+podSecs.includes("tech")+'">Todas las tecnológicas</button>'+secs.map(x=>'<button class="gchip'+(podSecs.includes(x)?" on":"")+'" data-podsecs="'+esc(x)+'" aria-pressed="'+podSecs.includes(x)+'">'+esc(x)+" · "+F.top100.filter(r=>secOf(r)===x).length+"</button>").join("")+"</div>"+
-    '<div class="label">Tipo de capital</div><div class="satchips"><button class="gchip'+(!podOwns.length?" on":"")+'" data-podowns="">Todos</button>'+Object.keys(OWNL).map(k=>'<button class="gchip'+(podOwns.includes(k)?" on":"")+'" data-podowns="'+k+'" aria-pressed="'+podOwns.includes(k)+'">'+OWNL[k]+"</button>").join("")+"</div>"+
-    '<div class="label">Países con los que comparar (una o varias regiones, y países sueltos)</div><div class="satchips"><button class="gchip'+(podConts.includes("world")?" on":"")+'" data-podconts="world">Todo el mundo</button><button class="gchip'+(podConts.includes("latam")?" on":"")+'" data-podconts="latam">América Latina</button>'+CONTS.map(c=>'<button class="gchip'+(podConts.includes(c)?" on":"")+'" data-podconts="'+esc(c)+'">'+esc(c)+"</button>").join("")+'<button class="gchip" data-podconts="">Ninguna región</button></div>'+
-    '<div class="podctl"><label class="label" for="podadd">Agregar un país</label><input id="podadd" class="satq podadd" list="podlist" placeholder="Escribe un país y elige de la lista"><datalist id="podlist">'+W.countries.slice().sort((a,b)=>a.name.localeCompare(b.name,"es")).map(c=>'<option value="'+esc(c.name)+'">').join("")+"</datalist>"+
-      podCtry.map(i=>{const c=W.countries.find(x=>x.iso3===i);return c?'<button class="gchip on" data-podrm="'+i+'" title="Quitar">'+esc(c.name)+" ✕</button>":""}).join("")+"</div>"+
-    (!ctry.length?'<p class="note warnline">Elige al menos una región o agrega un país para comparar.</p>':"")+'<div class="hblegend"><span><i style="background:#5CC8FF"></i>'+(EMP?"Fuerza laboral del país (personas)":"PIB "+W.year)+" ("+ctry.length+" países)</span><span><i style=\"background:#FF7A5C\"></i>"+esc(ML[podMetric])+" de "+cos.length+" empresas (Forbes "+esc(F.edition)+")</span></div>"+
-    (cos.length?'<p class="note"><b>'+beat.filter(b=>b.n>0).length+"</b> de estas "+cos.length+" empresas tienen "+(EMP?"más trabajadores que la fuerza laboral entera de":esc(ML[podMetric])+" mayores que el PIB de")+" al menos uno de los "+ctry.length+" países elegidos. La primera de la lista, "+esc(cos[0].company)+", supera "+(EMP?"la fuerza laboral":"el PIB")+" de "+beat[0].n+" de ellos.</p>":"")+
+  const cos=useCo?podCos().slice(0,podN):[];
+  const ctry=usePa?podCountries():[];
+  const ppl2=usePe?mrList().slice(0,mrN):[];
+  const rows=ctry.map(c=>({l:c.name,v:pval(c),c:"#5CC8FF",note:EMP?((lfOf(c)||{}).y?"fuerza laboral "+lfOf(c).y:""):(c.year?"dato "+c.year:""),pick:"pa:"+c.iso3}))
+    .concat(cos.map(r=>({l:r.company,v:cval(r),c:"#FF7A5C",pick:"co:"+r.rank+"|"+r.company,tag:'<small class="hbrank">#'+r.rank+"</small> "})))
+    .concat(ppl2.map(p=>({l:p.name,v:p.net_worth_busd,c:"#B39DFF",pick:"pe:"+p.rank,tag:'<small class="hbrank">👤</small> '}))).filter(r=>r.v!=null).sort((a,b)=>b.v-a.v);
+  const secs=[...new Set(F.top100.map(secOf))].sort();const scnt={};F.top100.forEach(r=>{const k=secOf(r);scnt[k]=(scnt[k]||0)+1});scnt.tech=F.top100.filter(r=>TECHIND.includes(r.industry)).length;
+  const regSum=(podConts.includes("world")?["Todo el mundo"]:podConts.map(c=>c==="latam"?"América Latina":c)).concat(podCtry.map(i=>(W.countries.find(x=>x.iso3===i)||{}).name||i));
+  const ent=[["co","Empresas"],["pa","Países"]].concat(M?[["pe","Personas más ricas"]]:[]);
+  h+='<section class="icard pod"><h4>¿Quién pesa más? Empresas, países y personas</h4><p class="note">Elige qué comparar y con qué medida. Los filtros se abren al tocarlos. Toca una barra para ver su ficha y su análisis tecnopolítico.</p>'+
+    '<div class="pfbar"><div class="pfgroup"><span class="label">Comparar</span><div class="seg2">'+ent.map(([k,l])=>'<button data-podent="'+k+'" aria-pressed="'+podEnt.includes(k)+'">'+l+"</button>").join("")+'</div></div>'+
+    '<div class="pfgroup"><span class="label">Medida</span><div class="seg2"><button data-podmetric="sales" aria-pressed="'+(podMetric==="sales")+'">Ventas</button><button data-podmetric="profits" aria-pressed="'+(podMetric==="profits")+'">Ganancias</button><button data-podmetric="mv" aria-pressed="'+(podMetric==="mv")+'">Valor de mercado</button><button data-podmetric="emp" aria-pressed="'+EMP+'">Trabajadores</button></div></div></div>'+
+    '<div class="pfbar">'+
+    (useCo?pfDet("co","Empresas",podN+" · "+sumList(podSecs,"todos los sectores",v=>v==="tech"?"tecnológicas":v)+(podOwns.length?" · capital "+podOwns.map(k=>OWNL[k].toLowerCase()).join("/"):""),
+      '<div class="label">Cuántas</div><div class="seg2">'+[10,20,30,40,50].map(n=>'<button data-podn="'+n+'" aria-pressed="'+(podN===n)+'">'+n+"</button>").join("")+"</div>"+
+      '<div class="label">Sectores (uno o varios)</div>'+chipsMulti("podsecs",[["tech","Todas las tecnológicas"]].concat(secs),podSecs,"Todos",scnt)+
+      '<div class="label">Tipo de capital</div>'+chipsMulti("podowns",Object.keys(OWNL).map(k=>[k,OWNL[k]]),podOwns,"Todos")):"")+
+    (usePa?pfDet("pa","Países",ctry.length+" · "+esc(regSum.length?(regSum.length>2?regSum.slice(0,2).join(", ")+" y "+(regSum.length-2)+" más":regSum.join(" y ")):"ninguno"),
+      '<div class="label">Regiones (una o varias)</div><div class="satchips"><button class="gchip'+(podConts.includes("world")?" on":"")+'" data-podconts="world">Todo el mundo</button><button class="gchip'+(podConts.includes("latam")?" on":"")+'" data-podconts="latam">América Latina</button>'+CONTS.map(c=>'<button class="gchip'+(podConts.includes(c)?" on":"")+'" data-podconts="'+esc(c)+'">'+esc(c)+"</button>").join("")+'<button class="gchip" data-podconts="">Ninguna</button></div>'+
+      '<label class="label" for="podadd">Agregar un país</label><input id="podadd" class="satq podadd" list="podlist" placeholder="Escribe un país y elige de la lista"><datalist id="podlist">'+W.countries.slice().sort((a,b)=>a.name.localeCompare(b.name,"es")).map(c=>'<option value="'+esc(c.name)+'">').join("")+"</datalist>"+
+      '<div class="satchips">'+podCtry.map(i=>{const c=W.countries.find(x=>x.iso3===i);return c?'<button class="gchip on" data-podrm="'+i+'" title="Quitar">'+esc(c.name)+" ✕</button>":""}).join("")+"</div>"):"")+
+    (M&&podEnt.includes("pe")?pfDet("pe","Personas",(EMP?"no aplica a trabajadores":mrN+" · "+sumList(mrSecs,"todos los sectores")),
+      '<div class="label">Cuántas</div><div class="seg2">'+[10,20,30,40,50].map(n=>'<button data-mrn="'+n+'" aria-pressed="'+(mrN===n)+'">'+n+"</button>").join("")+"</div>"+
+      '<div class="label">Sectores de su fortuna (uno o varios)</div>'+(()=>{const c={};M.people.forEach(p=>{const k=mrSec(p);c[k]=(c[k]||0)+1});return chipsMulti("mrsecs",Object.keys(c).sort((a,b)=>c[b]-c[a]),mrSecs,"Todos",c)})()):"")+
+    "</div>"+
+    (!rows.length?'<p class="note warnline">No hay nada que comparar con esta selección: activa empresas, países o personas, o amplía los filtros.</p>':"")+
+    '<div class="hblegend">'+(usePa?'<span><i style="background:#5CC8FF"></i>'+(EMP?"Fuerza laboral del país":"PIB "+W.year+" del país")+" · "+ctry.length+"</span>":"")+(useCo?'<span><i style="background:#FF7A5C"></i>'+esc(ML[podMetric])+" de la empresa · "+cos.length+"</span>":"")+(usePe?'<span><i style="background:#B39DFF"></i>Patrimonio de la persona · '+ppl2.length+"</span>":"")+"</div>"+
+    (EMP&&podEnt.includes("pe")&&M?'<p class="note">Las personas no se muestran con la medida «Trabajadores».</p>':"")+
     '<div class="hbscroll">'+(EMP?hbarsC(rows,{fmt:ppl,tfmt:pplL}):hbarsC(rows))+"</div>"+
-    (EMP?'<p class="note warnline">Cómo leer esta comparación: compara cuántas personas emplea cada empresa en todo el mundo con la fuerza laboral total de cada país (personas ocupadas o buscando empleo). Muestra el peso de las corporaciones como empleadoras globales; no significa que sus trabajadores estén en esos países. Las cifras de empleados son las reportadas por cada empresa (año fiscal más reciente) y pueden incluir contratistas según la empresa.</p><p class="note">Fuerza laboral: <a href="https://data.worldbank.org/indicator/SL.TLF.TOTL.IN" target="_blank" rel="noopener">Banco Mundial, WDI, SL.TLF.TOTL.IN (estimaciones modeladas de la OIT)</a>, actualizado el 24-feb-2026. Empleados: '+esc((RES.empleados_meta||{}).source||"Fortune Global 500 e informes anuales")+'; cada empresa cita su fuente en la ficha.'+(cos.filter(r=>cval(r)==null).length?" Sin dato de empleados: "+cos.filter(r=>cval(r)==null).map(r=>esc(r.company)).join(", ")+".":"")+"</p>":"")+
-    (EMP?"":'<p class="note warnline">Cómo leer esta comparación: el PIB mide el valor que produce un país en un año; las ventas de una empresa no son valor agregado (incluyen lo que compra a otros) y el valor de mercado es lo que la bolsa paga por ella en un día, no un flujo anual. Sirve para dimensionar el poder económico de las empresas, no para afirmar que «son más grandes que un país».</p>')+
-    '<p class="note">PIB: '+srcA(W.source_url,W.source)+". "+esc(W.note)+" Empresas: "+srcA(F.source_url,"Forbes Global 2000 "+F.edition)+".</p></section>";
-  /* 2. PIB por continente */
+    '<details class="pfnote"><summary>Cómo leer esta comparación y fuentes</summary>'+
+    (EMP?'<p class="note">Compara cuántas personas emplea cada empresa en todo el mundo con la fuerza laboral total de cada país (personas ocupadas o buscando empleo). Muestra el peso de las corporaciones como empleadoras globales; no significa que sus trabajadores estén en esos países.</p><p class="note">Fuerza laboral: <a href="https://data.worldbank.org/indicator/SL.TLF.TOTL.IN" target="_blank" rel="noopener">Banco Mundial, WDI, SL.TLF.TOTL.IN (estimaciones modeladas de la OIT)</a>, actualizado el 24-feb-2026. Empleados: '+esc((RES.empleados_meta||{}).source||"")+'.'+(cos.filter(r=>cval(r)==null).length?" Sin dato de empleados: "+cos.filter(r=>cval(r)==null).map(r=>esc(r.company)).join(", ")+".":"")+"</p>"
+      :'<p class="note">El PIB mide el valor que produce un país en un año; las ventas de una empresa no son valor agregado y el valor de mercado es lo que la bolsa paga por ella en un día. El patrimonio de una persona es una fortuna acumulada (sobre todo acciones), no un ingreso anual. Sirve para dimensionar el poder económico, no para afirmar que alguien «es más grande que un país».</p>')+
+    '<p class="note">PIB: '+srcA(W.source_url,W.source)+". Empresas: "+srcA(F.source_url,"Forbes Global 2000 "+F.edition)+"."+(M?" Personas: "+srcA(M.source_url,"Forbes, multimillonarios "+M.edition)+(M.date_of_values?" (patrimonio al "+esc(M.date_of_values)+")":"")+".":"")+"</p></details></section>";
+  }
+  if(podView==="pib"){
   const PL=pibList(pibCont).slice().sort((a,b)=>b.gdp_busd-a.gdp_busd);const tot={};W.countries.forEach(c=>{tot[c.continent]=(tot[c.continent]||0)+c.gdp_busd});
   h+='<section class="icard pod"><div class="label">FMI · '+W.year+'</div><h4>Producto interno bruto de los países, por continente</h4>'+contChips(pibCont,"pibcont",true)+
     (!pibCont?'<div class="label">Total por continente</div>'+hbars(CONTS.map(c=>({l:c,v:tot[c]||0,c:"#8C9CFF"})).sort((a,b)=>b.v-a.v)):"")+
     '<div class="label">'+(pibCont?(pibCont==="latam"?"América Latina":esc(pibCont)):"Todos los países")+" · "+PL.length+" países · suma "+usd(PL.reduce((a,c)=>a+c.gdp_busd,0))+'</div><div class="hbscroll">'+hbarsC(PL.map(c=>({l:c.name,v:c.gdp_busd,c:c.year?"#7C879C":"#5CC8FF",note:c.year?"dato "+c.year:"",pick:"pa:"+c.iso3})))+"</div>"+
     '<p class="note">Toca un país para ver su ficha. Fuente: '+srcA(W.source_url,W.source)+". * Cuba: Banco Mundial 2020 (el FMI no la incluye).</p></section>";
-  /* 3. top 10 tech (se mantiene) */
+  }
+  if(podView==="tech"){
   h+='<section class="icard pod"><div class="label">Forbes Global 2000 · edición '+esc(F.edition)+'</div><h4>Las 10 tecnológicas mejor ubicadas y sus ganancias de 2025</h4>'+
     '<div class="tscroll"><table class="ptable"><thead><tr><th scope="col">Puesto</th><th scope="col">Empresa</th><th scope="col">País</th><th scope="col">Capital</th><th scope="col">Ventas*</th><th scope="col">Ganancias*</th><th scope="col">Valor de mercado</th><th scope="col">Ganancia neta reportada, año fiscal 2025</th></tr></thead><tbody>'+
     F.tech_top10.map(r=>{const p=pf(r.company);const R=F.top100.find(x=>x.rank===r.rank_global&&x.company===r.company)||{rank:r.rank_global,company:r.company};return "<tr><td>"+r.rank_global+'</td><th scope="row"><button class="linkbtn" data-podpick="co:'+esc(R.rank+"|"+R.company)+'">'+esc(r.company)+"</button><small>"+esc(SEC[r.industry]||r.industry)+"</small></th><td>"+esc(cn2(r.country))+"</td><td>"+ownPill((emp(R)||{}).ownership)+"</td><td>"+usd(r.sales_busd)+"</td><td>"+usd(r.profits_busd)+"</td><td>"+usd(r.market_value_busd)+"</td><td>"+
       (p?(p.net_income_busd!=null?"<b>"+usd(p.net_income_busd)+"</b>":esc(p.net_income_local||"—"))+"<small>"+esc(p.fiscal_year)+" · "+srcA(p.src,"informe de la empresa")+"</small>":"—")+"</td></tr>"}).join("")+
     '</tbody></table></div><p class="note">* Ventas y ganancias según Forbes: últimos 12 meses a la fecha de corte. La última columna es la ganancia que cada empresa reportó en su año fiscal 2025; Samsung, TSMC, Tencent y SK Hynix reportan en su moneda y no se convirtió a dólares. '+esc(F.method)+'</p><button class="btn" data-resopen="null">📊 Infografía con estos datos</button></section>';
-  /* 4. top 100 con sector, dueños y capital */
+  }
+  if(podView==="top"){
   const q=podQ.trim().toLowerCase();let L=F.top100.filter(r=>{const e=emp(r)||{};return (!q||(r.company+" "+secOf(r)+" "+cn2(r.country)+" "+(e.owners||[]).map(o=>o.name).join(" ")).toLowerCase().includes(q))&&secOK(r)&&ownOK(r)});
   const key={rank:r=>r.rank,sales:r=>-r.sales_busd,profits:r=>-r.profits_busd,mv:r=>-r.market_value_busd,assets:r=>-r.assets_busd,state:r=>-(((emp(r)||{}).state_pct)||0)}[podSort]||(r=>r.rank);L=L.slice().sort((a,b)=>key(a)-key(b)||a.rank-b.rank);
   const th=(k,l)=>'<th scope="col"><button class="linkbtn" data-podsort="'+k+'" aria-pressed="'+(podSort===k)+'">'+l+(podSort===k?" ▼":"")+"</button></th>";
   const oc={};F.top100.forEach(r=>{const t=(emp(r)||{}).ownership||"sin";oc[t]=(oc[t]||0)+1});
   h+='<section class="icard pod"><div class="label">Forbes Global 2000 · '+esc(F.edition)+'</div><h4>Las 100 empresas más grandes del mundo: sector, dueños y tipo de capital</h4>'+
-    '<p class="note">Orden de Forbes, de mayor a menor. Capital: <b>pública</b> si el Estado tiene 50 % o más; <b>mixta</b> si tiene entre 10 % y 50 % o derechos especiales; <b>privada</b> en otro caso. En el top 100: '+Object.keys(OWNL).map(k=>(oc[k]||0)+" "+OWNL[k].toLowerCase()+"s").join(", ")+(oc.sin?", "+oc.sin+" en revisión":"")+'. Los filtros de sector y capital de arriba también aplican aquí. Toca una empresa para ver su ficha.</p>'+
+    '<p class="note">Orden de Forbes, de mayor a menor. Capital: <b>pública</b> si el Estado tiene 50 % o más; <b>mixta</b> si tiene entre 10 % y 50 % o derechos especiales; <b>privada</b> en otro caso. En el top 100: '+Object.keys(OWNL).map(k=>(oc[k]||0)+" "+OWNL[k].toLowerCase()+"s").join(", ")+(oc.sin?", "+oc.sin+" en revisión":"")+'. Los filtros de sector y capital de la comparación también aplican aquí. Toca una empresa para ver su ficha.</p>'+
     '<input id="podq" class="satq" type="search" placeholder="Buscar empresa, sector, país o dueño" value="'+esc(podQ)+'">'+
     '<div class="tscroll tall"><table class="ptable"><thead><tr>'+th("rank","Puesto")+'<th scope="col">Empresa y sector</th><th scope="col">País</th>'+th("state","Capital")+'<th scope="col" class="tleft">Dueños principales</th>'+th("sales","Ventas")+th("profits","Ganancias")+th("mv","Valor de mercado")+"</tr></thead><tbody>"+
     L.map(r=>{const e=emp(r)||{};const ow=(e.owners||[]).filter(o=>o.kind!=="publico_disperso").slice(0,3);return "<tr"+(TECHIND.includes(r.industry)?' class="tech"':"")+"><td>"+r.rank+'</td><th scope="row"><button class="linkbtn" data-podpick="co:'+esc(r.rank+"|"+r.company)+'">'+esc(r.company)+"</button><small>"+esc(secOf(r))+"</small></th><td>"+esc(cn2(r.country))+"</td><td>"+ownPill(e.ownership)+(e.state_pct?"<small>"+nfmt(e.state_pct)+" % estatal</small>":"")+'</td><td class="tleft"><small class="owners">'+(ow.length?ow.map(o=>esc(o.name.split(" (")[0])+(o.pct!=null?" "+nfmt(o.pct)+" %":"")).join(" · "):"—")+"</small></td><td>"+usdS(r.sales_busd)+"</td><td>"+usdS(r.profits_busd)+"</td><td>"+usdS(r.market_value_busd)+"</td></tr>"}).join("")+
     "</tbody></table></div><p class=\"note\">Cifras en US$ (bill. = billones, millones de millones; mil M = miles de millones). Resaltadas: tecnológicas según Forbes (Amazon y Alibaba Forbes las clasifica como comercio). Dueños: informes anuales, registros ante reguladores y medios de referencia; cada ficha cita sus fuentes y la fecha del dato. Fuente de la lista: "+srcA(F.source_url,"Forbes")+" vía "+srcA((F.top100[0]||{}).src,"InsideIIM")+".</p></section>";
+  }
+  if(podView==="ricos"&&M){const L=mrList().filter(p=>!mrQ||(p.name+" "+(p.source_of_wealth||"")+" "+cn2(p.country)).toLowerCase().includes(mrQ.toLowerCase()));const c={};M.people.forEach(p=>{const k=mrSec(p);c[k]=(c[k]||0)+1});
+    const bySec={};M.people.forEach(p=>{const k=mrSec(p);bySec[k]=(bySec[k]||0)+p.net_worth_busd});
+    h+='<section class="icard pod"><div class="label">Forbes · multimillonarios '+esc(M.edition)+'</div><h4>Las personas más ricas del mundo, por sector</h4><p class="note">'+esc(M.method||"")+(M.date_of_values?" Patrimonio al "+esc(M.date_of_values)+".":"")+' Toca un nombre para ver su ficha.</p>'+
+      '<div class="label">Sectores (uno o varios)</div>'+chipsMulti("mrsecs",Object.keys(c).sort((a,b)=>c[b]-c[a]),mrSecs,"Todos",c)+
+      '<details class="pfnote"><summary>Patrimonio sumado por sector</summary>'+hbars(Object.keys(bySec).map(k=>({l:k,v:bySec[k],c:"#B39DFF"})).sort((a,b)=>b.v-a.v))+"</details>"+
+      '<input id="mrq" class="satq" type="search" placeholder="Buscar persona, empresa o país" value="'+esc(mrQ)+'">'+
+      '<div class="tscroll tall"><table class="ptable"><thead><tr><th scope="col">Puesto</th><th scope="col">Persona</th><th scope="col">Patrimonio</th><th scope="col">País</th><th scope="col" class="tleft">Origen de la fortuna</th></tr></thead><tbody>'+
+      L.map(p=>"<tr"+(p.industry==="Technology"?' class="tech"':"")+"><td>"+p.rank+'</td><th scope="row"><button class="linkbtn" data-podpick="pe:'+p.rank+'">'+esc(p.name)+"</button><small>"+esc(mrSec(p))+"</small></th><td>"+usdS(p.net_worth_busd)+"</td><td>"+esc(cn2(p.country))+'</td><td class="tleft">'+esc(p.source_of_wealth||"")+"</td></tr>").join("")+
+      '</tbody></table></div><p class="note">Fuente: '+srcA(M.source_url,"Forbes")+". "+(M.notes||[]).slice(0,2).map(esc).join(" ")+"</p></section>"}
   return h}
 
 /* ----- fichas con análisis tecnopolítico ----- */
@@ -2945,6 +2996,13 @@ function podFicha(){const F=FB(),W=PW();const [t,id]=[podPick.slice(0,2),podPick
       ((e.owners||[]).length?'<ul class="fichal">'+e.owners.map(o=>"<li><b>"+esc(o.name)+"</b>"+(o.pct!=null?" · "+nfmt(o.pct)+" %":"")+' <small>'+esc(({estado:"Estado",familia:"familia",fundador:"fundador",fondo_inversion:"fondo de inversión",empleados:"empleados",publico_disperso:"accionistas dispersos",otra_empresa:"empresa"})[o.kind]||o.kind||"")+"</small></li>").join("")+"</ul>":'<p class="note">Propiedad en revisión.</p>')+
       (e.state_pct?'<p class="note">Participación estatal: '+nfmt(e.state_pct)+" %"+(e.state_holder?" · "+esc(e.state_holder):"")+"</p>":"")+(e.asof?'<p class="note">Dato de propiedad a: '+esc(e.asof)+"</p>":"")+
       '<div class="label">Análisis tecnopolítico</div><p>'+esc(e.analisis||"En preparación.")+"</p>"+factsHTML(e)}
+  else if(t==="pe"){const M=MR2();const p=M&&M.people.find(x=>String(x.rank)===id);if(!p)return"";const co=p.company_rank_forbes2000?F.top100.find(r=>r.rank===p.company_rank_forbes2000):null;
+    const less=W.countries.filter(c=>c.gdp_busd<p.net_worth_busd);
+    h='<div class="label">Ficha de persona · puesto '+p.rank+" en Forbes "+esc(M.edition)+'</div><h4 class="fichah">'+esc(p.name)+"</h4>"+
+      '<div class="fmeta"><span class="tpill" style="--c:#B39DFF">'+esc(mrSec(p))+'</span> <span class="tpill" style="--c:#7FD8BE">'+esc(cn2(p.country))+"</span></div>"+
+      '<div class="kpis sm"><div class="kpi"><b>'+usdS(p.net_worth_busd)+'</b><span>patrimonio (Forbes'+(M.date_of_values?", "+esc(M.date_of_values):"")+')</span></div><div class="kpi"><b>'+less.length+'</b><span>países con un PIB anual menor que su fortuna</span></div></div>'+
+      '<p><b>Origen de la fortuna:</b> '+esc(p.source_of_wealth||"—")+"</p>"+(co?'<p><button class="linkbtn" data-podpick="co:'+esc(co.rank+"|"+co.company)+'">Ver la ficha de '+esc(co.company)+"</button> (puesto "+co.rank+" en Forbes Global 2000), con sus dueños y su análisis tecnopolítico.</p>":"")+
+      '<p class="note">Un patrimonio es riqueza acumulada, sobre todo en acciones; el PIB es lo que produce un país en un año. Fuente: '+srcA(p.src||M.source_url,"Forbes")+".</p>"}
   else{const c=W.countries.find(x=>x.iso3===id);if(!c)return"";const A=(RES.paises||{})[id];const rk=W.countries.slice().sort((a,b)=>b.gdp_busd-a.gdp_busd).findIndex(x=>x.iso3===id)+1;
     const big=F.top100.filter(r=>r.sales_busd>c.gdp_busd);
     const ind=[];const add=(l,v)=>{if(v)ind.push('<div class="kpi"><b>'+v+"</b><span>"+l+"</span></div>")};
@@ -3002,6 +3060,10 @@ function resExtra(A,ctx,R,src,cut){
 function poderClick(e){
   const s=e.target.closest("[data-podsort]");if(s){podSort=s.dataset.podsort;store.set("radar-podsort",podSort);renderViz();return true}
   const m=e.target.closest("[data-podmetric]");if(m){podMetric=m.dataset.podmetric;store.set("radar-podmetric",podMetric);renderViz();return true}
+  const pv=e.target.closest("[data-podview]");if(pv){podView=pv.dataset.podview;store.set("radar-podview",podView);renderViz();return true}
+  const pe=e.target.closest("[data-podent]");if(pe){togArr(podEnt,pe.dataset.podent);store.set("radar-podent",podEnt);renderViz();return true}
+  const mn=e.target.closest("[data-mrn]");if(mn){mrN=+mn.dataset.mrn;store.set("radar-mrn",mrN);renderViz();return true}
+  const ms=e.target.closest("[data-mrsecs]");if(ms){const v=ms.dataset.mrsecs;if(!v)mrSecs=[];else togArr(mrSecs,v);store.set("radar-mrsecs",mrSecs);renderViz();return true}
   const n=e.target.closest("[data-podn]");if(n){podN=+n.dataset.podn;store.set("radar-podn",podN);renderViz();return true}
   const pc=e.target.closest("[data-podconts]");if(pc){const v=pc.dataset.podconts;if(!v)podConts=[];else if(v==="world")podConts=podConts.includes("world")?[]:["world"];else{podConts=podConts.filter(x=>x!=="world");togArr(podConts,v)}store.set("radar-podconts",podConts);renderViz();return true}
   const ps=e.target.closest("[data-podsecs]");if(ps){const v=ps.dataset.podsecs;if(!v)podSecs=[];else togArr(podSecs,v);store.set("radar-podsecs",podSecs);renderViz();return true}
@@ -3014,6 +3076,8 @@ function poderClick(e){
   const th=e.target.closest("[data-tlth]");if(th){tlTh=th.dataset.tlth;renderViz();return true}
   return false}
 document.addEventListener("change",e=>{if(!e.target||e.target.id!=="podadd")return;const W=PW();const v=e.target.value.trim().toLowerCase();const c=W&&W.countries.find(x=>x.name.toLowerCase()===v);if(c&&!podCtry.includes(c.iso3)){podCtry.push(c.iso3);store.set("radar-podctry",podCtry);renderViz()}});
+document.addEventListener("toggle",e=>{const d=e.target;if(d&&d.classList&&d.classList.contains("pfdet")){if(d.open){podOpen=d.dataset.pfkey;document.querySelectorAll(".pfdet[open]").forEach(o=>{if(o!==d)o.open=false})}else if(podOpen===d.dataset.pfkey)podOpen=null}},true);
+var mrQT=null;document.addEventListener("input",e=>{if(e.target&&e.target.id==="mrq"){mrQ=e.target.value;clearTimeout(mrQT);mrQT=setTimeout(()=>{const pos=e.target.selectionStart;renderViz();const n=$("#mrq");if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(_){}}},300)}});
 var podQT=null;document.addEventListener("input",e=>{if(e.target&&e.target.id==="podq"){podQ=e.target.value;clearTimeout(podQT);podQT=setTimeout(()=>{const pos=e.target.selectionStart;renderViz();const n=$("#podq");if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(_){}}},300)}});
 
 (async function(){
