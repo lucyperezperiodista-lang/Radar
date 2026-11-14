@@ -463,7 +463,7 @@ body.fs-open{overflow:hidden}
 .satchips{display:flex;flex-wrap:wrap;gap:6px}.satchips .gchip i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:-1px}
 .gchip.on{background:var(--sky-ink);color:var(--sky);border-color:var(--sky-ink)}
 .satq{width:100%;box-sizing:border-box;padding:7px 10px;border-radius:8px;border:1px solid var(--sky-line);background:var(--sky);color:var(--sky-ink);font:inherit}
-.satbars{display:grid;gap:3px}
+.satbars{display:grid;gap:3px}.satlist{display:flex;flex-wrap:wrap;gap:5px;max-height:160px;overflow:auto}
 .satbar{display:grid;grid-template-columns:minmax(0,1.3fr) 1fr auto;gap:8px;align-items:center;background:none;border:0;color:var(--sky-ink);font:inherit;font-size:12.5px;text-align:left;padding:2px 0;cursor:pointer}
 .satbar span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.satbar i{display:block;height:8px;border-radius:4px;background:#5CC8FF}.satbar b{font-variant-numeric:tabular-nums}
 .satbar:hover span{text-decoration:underline}
@@ -2681,8 +2681,9 @@ function satPanelHTML(){
     '<label class="label" for="satq">Buscar por nombre, empresa o país</label><input id="satq" class="satq" type="search" placeholder="Ej.: Starlink, Colombia, Kuiper, GPS" value="'+esc(satQ)+'">'+
     '<div class="label">¿De quién son? Operadores con más satélites</div><div class="satbars">'+top(ops,10).map(([o,n])=>'<button class="satbar" data-satop="'+esc(o)+'" title="Filtrar por '+esc(o)+'"><span>'+esc(o)+'</span><i style="width:'+(n/mx*100).toFixed(1)+'%"></i><b>'+n.toLocaleString("es-CO")+"</b></button>").join("")+"</div>"+
     '<div class="label">Países u organizaciones dueñas</div><p class="note">'+top(own,8).map(([o,n])=>esc(o)+" "+n.toLocaleString("es-CO")).join(" · ")+"</p>";
+  if(satQ.trim()&&F.length)h+='<div class="label">Resultados</div><div class="satlist">'+F.slice(0,25).map(x=>'<button class="gchip" data-satpick="'+satD.sats.indexOf(x)+'">'+esc(x.nm)+"</button>").join("")+(F.length>25?'<span class="note">y '+(F.length-25).toLocaleString("es-CO")+" más</span>":"")+"</div>";
   if(satPickI!=null&&satD.sats[satPickI])h+=satInfo(satD.sats[satPickI]);
-  else h+='<p class="note">Toca un satélite en el globo para ver de qué empresa es, cuándo se lanzó, su uso y su vida útil.</p>';
+  else h+='<p class="note">Toca un satélite en el globo, o búscalo por nombre o empresa, para ver de qué empresa es, cuándo se lanzó, su uso y su vida útil.</p>';
   return h+'<p class="note">Fuentes: '+satD.meta.sources.map(s=>'<a href="'+esc(s.u)+'" target="_blank" rel="noopener">'+esc(s.t)+"</a>").join(" · ")+". El uso y el operador vienen de la base UCS (edición 2023) cuando el satélite está allí; si no, del grupo temático de CelesTrak; "+satD.meta.stats.none.toLocaleString("es-CO")+" satélites quedan «sin datos».</p></div>"}
 function satEpoch(){const e=String(satD.meta.tle_epoch_max||"");const yy=+e.slice(0,2),dd=parseFloat(e.slice(2));if(!dd)return"";const d=new Date(Date.UTC(2000+yy,0,1));d.setUTCDate(d.getUTCDate()+Math.floor(dd)-1);return d.toLocaleDateString("es-CO",{day:"numeric",month:"short",year:"numeric"})}
 function yrs(a,b){return (b-a)/31557600000}
@@ -2770,6 +2771,7 @@ function globeClick(e){
   const so=e.target.closest("[data-satson]");if(so&&e.target.tagName==="INPUT"){satOn=e.target.checked;store.set("radar-sats",satOn);if(satOn)satLoad();renderViz();return true}
   const su=e.target.closest("[data-satuse]");if(su){satUse=su.dataset.satuse;store.set("radar-satuse",satUse);satPickI=null;renderViz();return true}
   const sop=e.target.closest("[data-satop]");if(sop){satQ=sop.dataset.satop==="Sin datos de operador"?"":sop.dataset.satop;satPickI=null;renderViz();return true}
+  const sp=e.target.closest("[data-satpick]");if(sp){satPickI=+sp.dataset.satpick;renderViz();if(G3&&satPos&&satPos[satPickI]){const p=satPos[satPickI];G3.gl.pointOfView({lat:p.lat,lng:p.lng,altitude:Math.max(1.6,p.h/6371+1.2)},1000)}return true}
   if(e.target.closest("[data-satclose]")){satPickI=null;renderViz();return true}
   if(e.target.closest("[data-satfocus]")&&G3&&satPos&&satPos[satPickI]){const p=satPos[satPickI];G3.gl.pointOfView({lat:p.lat,lng:p.lng,altitude:Math.max(1.2,p.h/6371+1)},1200);return true}
   const gz=e.target.closest("[data-gz]");if(gz&&G3){const a=gz.dataset.gz,pv=G3.gl.pointOfView();

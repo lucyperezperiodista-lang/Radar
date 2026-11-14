@@ -43,10 +43,12 @@ for r in rows[1:]:
     ucs[n]=dict(op=g('Operator/Owner'),ct=g('Country of Operator/Owner'),us=g('Users'),pu=g('Purpose'),dp=g('Detailed Purpose'),lt=g('Expected Lifetime (yrs.)'),orb=g('Class of Orbit'))
 PU={'Communications':'Comunicaciones','Earth Observation':'Observación de la Tierra','Navigation/Global Positioning':'Navegación','Navigation/Regional Positioning':'Navegación regional',
  'Technology Development':'Desarrollo tecnológico','Technology Demonstration':'Demostración tecnológica','Space Science':'Ciencia espacial','Earth Science':'Ciencias de la Tierra',
- 'Space Observation':'Observación espacial','Surveillance':'Vigilancia','Educational':'Educación','Signals Intelligence':'Inteligencia de señales','Unknown':'Desconocido'}
+ 'Space Observation':'Observación espacial','Surveillance':'Vigilancia','Educational':'Educación','Signals Intelligence':'Inteligencia de señales','Unknown':'Desconocido','Navigation':'Navegación','Maritime Tracking':'Rastreo marítimo','Mission Extension Technology':'Extensión de vida de satélites'}
 US={'Commercial':'Comercial','Government':'Gobierno','Military':'Militar','Civil':'Civil'}
 def tr(s,d):
-    return '/'.join(d.get(x.strip(),x.strip()) for x in s.split('/')) if s else ''
+    if not s: return ''
+    if s.strip() in d: return d[s.strip()]
+    return '/'.join(d.get(x.strip(),x.strip()) for x in s.split('/'))
 OWN={'US':'EE. UU.','PRC':'China','CIS':'Rusia (CEI)','UK':'Reino Unido','FR':'Francia','JPN':'Japón','IND':'India','ESA':'Agencia Espacial Europea','EUME':'EUMETSAT','GER':'Alemania','CA':'Canadá','ISS':'Estación Espacial Internacional','LUXE':'Luxemburgo','ITSO':'Intelsat','SES':'SES','O3B':'O3b (SES)','EUTE':'Eutelsat','KOR':'Corea del Sur','ISRA':'Israel','IT':'Italia','SPN':'España','BRAZ':'Brasil','ARGN':'Argentina','MEX':'México','CHLE':'Chile','PER':'Perú','COL':'Colombia','BOL':'Bolivia','ECU':'Ecuador','VENZ':'Venezuela','URY':'Uruguay','PRY':'Paraguay','CRI':'Costa Rica','GUAT':'Guatemala','UAE':'Emiratos Árabes Unidos','SAUD':'Arabia Saudita','TURK':'Turquía','AUS':'Australia','NZ':'Nueva Zelanda','FIN':'Finlandia','NOR':'Noruega','SWED':'Suecia','NETH':'Países Bajos','IRAN':'Irán','TWN':'Taiwán','SING':'Singapur','INDO':'Indonesia','THAI':'Tailandia','SAFR':'Sudáfrica','NIG':'Nigeria','EGYP':'Egipto','KAZ':'Kazajistán','UKR':'Ucrania','PAKI':'Pakistán','LTU':'Lituania','POL':'Polonia','DEN':'Dinamarca','SWTZ':'Suiza','AB':'Arabsat','ORB':'ORBCOMM','GLOB':'Globalstar','IM':'Inmarsat','NICO':'Nicaragua','ITSO':'Intelsat','RWA':'Ruanda','VTNM':'Vietnam','MALA':'Malasia','PHIL':'Filipinas','NKOR':'Corea del Norte','QAT':'Catar','BGD':'Bangladés','BEL':'Bélgica','AUT':'Austria','CZE':'Chequia','GREC':'Grecia','HUN':'Hungría','PRT':'Portugal','ROM':'Rumania','EST':'Estonia','SVN':'Eslovenia','SVK':'Eslovaquia','BUL':'Bulgaria','KEN':'Kenia','GHA':'Ghana','ETH':'Etiopía','MA':'Marruecos','ALG':'Argelia','TUN':'Túnez','AZER':'Azerbaiyán','BELA':'Bielorrusia','TMMC':'Turkmenistán','MNG':'Mongolia','NPL':'Nepal','LKA':'Sri Lanka','MMR':'Myanmar','LAOS':'Laos','KAZ':'Kazajistán','JOR':'Jordania','KWT':'Kuwait','IRAQ':'Irak','BHR':'Baréin','ISRO':'India (ISRO)','IRID':'Iridium','FGER':'Francia/Alemania','FRIT':'Francia/Italia','NATO':'OTAN','SEAL':'Sea Launch','ESRO':'ESRO','RASC':'RascomStar-QAF','AC':'AsiaSat','STCT':'Singapur/Taiwán','PRES':'China/ESA','USBZ':'EE. UU./Brasil','CHBZ':'China/Brasil'}
 sats=[]; stats={'ucs':0,'grp':0,'none':0}
 for nm,l1,l2 in act:
@@ -65,7 +67,7 @@ for nm,l1,l2 in act:
     else: stats['none']+=1
     sats.append(o)
 ep=max(l1[18:32] for _,l1,_ in act)
-meta=dict(count=len(sats),stats=stats,tle_epoch_max=ep,generated=datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%MZ'),
+meta=dict(count=len(sats),stats=stats,tle_epoch_max=ep,generated=datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%MZ'),
  sources=[{'t':'CelesTrak — elementos orbitales de satélites activos (GROUP=active), vía espejo automático satvisorcom/satvisor-data','u':'https://celestrak.org/NORAD/elements/gp.php?GROUP=active&FORMAT=tle'},
   {'t':'CelesTrak SATCAT — dueño (país u organización), fecha de lanzamiento, tipo de objeto, vía espejo astrion-tech/celestrak-mirror','u':'https://celestrak.org/satcat/search.php'},
   {'t':'Union of Concerned Scientists, UCS Satellite Database (edición 1 ene 2023): operador, usuarios, propósito, vida útil esperada','u':'https://www.ucs.org/resources/satellite-database'},
