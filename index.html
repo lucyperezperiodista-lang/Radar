@@ -1468,24 +1468,24 @@ const MINS=[
   ["Sn","Estaño","#DADDE3"],["NbTa","Tantalio y niobio (coltán)","#B39DFF"],["PGE","Platino y paladio","#F0F0FF"],["Mn","Manganeso","#D4685C"],["V","Vanadio","#FFB4A2"],["Ti","Titanio","#80DEEA"],
   ["Te","Telurio","#E6C27A"],["Re","Renio (cobre y molibdeno)","#C9925A"],["Be","Berilio","#A5D6A7"],["F","Fluorita","#CE93D8"],["Ba","Barita","#8D9BB0"],["ZrHf","Circonio y hafnio","#BCAAA4"]];
 const MCOL={},MNAME={};MINS.forEach(([c,n,col])=>{MCOL[c]=col;MNAME[c]=n});
-let minF=store.get("radar-minf")||"all", minSel=store.get("radar-minsel")||"REE", minOpen=null;
+let minF=(v=>Array.isArray(v)?v:(!v||v==="all"?[]:[v]))(store.get("radar-minf")), minSel=store.get("radar-minsel")||"REE", minOpen=null;
 const MR=()=>(window.__RESEARCH__||{}).minerals||{};
 const minDeps=()=>MR().deps||[];
 const minSites=()=>(MR().sites||[]);
 const minMeta=c=>(MR().meta||{})[c]||null;
-const minMatch=codes=>minF==="all"||String(codes).split(",").includes(minF);
-const minCol=codes=>{const c=String(codes).split(",");if(minF!=="all"&&c.includes(minF))return MCOL[minF];return MCOL[c[0]]||"#8D9BB0"};
+const minMatch=codes=>!minF.length||String(codes).split(",").some(c=>minF.includes(c));
+const minCol=codes=>{const c=String(codes).split(",");const m=c.find(x=>minF.includes(x));if(m)return MCOL[m];return MCOL[c[0]]||"#8D9BB0"};
 const isoName=i2=>{try{return new Intl.DisplayNames(["es"],{type:"region"}).of(i2)}catch(_){return i2}};
 function minChips(){const D=minDeps(),S=minSites(),cnt={};D.forEach(d=>String(d[3]).split(",").forEach(c=>cnt[c]=(cnt[c]||0)+1));S.forEach(s=>(s.minerals||[]).forEach(c=>cnt[c]=(cnt[c]||0)+1));
   const have=MINS.filter(([c])=>cnt[c]);
-  return '<div class="fchips minchips" role="group" aria-label="Filtrar por mineral"><button class="fchip" data-minf="all" aria-pressed="'+(minF==="all")+'">Todos</button>'+have.map(([c,n,col])=>'<button class="fchip" data-minf="'+c+'" aria-pressed="'+(minF===c)+'"><i class="mdot" style="background:'+col+'"></i>'+esc(n)+" <small>"+cnt[c]+"</small></button>").join("")+"</div>"}
+  return '<div class="fchips minchips" role="group" aria-label="Filtrar por mineral"><span class="note minhint">Elige uno o varios minerales:</span><button class="fchip" data-minf="all" aria-pressed="'+(!minF.length)+'">Todos</button>'+have.map(([c,n,col])=>'<button class="fchip" data-minf="'+c+'" aria-pressed="'+minF.includes(c)+'"><i class="mdot" style="background:'+col+'"></i>'+esc(n)+" <small>"+cnt[c]+"</small></button>").join("")+"</div>"}
 function minMapSVG(){let s="";
   if(isOn("yac")&&minDeps().length)minDeps().forEach((d,i)=>{if(!minMatch(d[3]))return;s+='<circle cx="'+d[0]+'" cy="'+d[1]+'" r="1.7" class="ydep" fill="'+minCol(d[3])+'" data-ipt="yac:'+i+'"><title>'+esc(d[2]+" · "+String(d[3]).split(",").map(c=>MNAME[c]||c).join(", "))+"</title></circle>"});
   if(isOn("minas")&&minSites().length)minSites().forEach((m,i)=>{if(m.x==null||!minMatch((m.minerals||[]).join(",")))return;const r=3.6;
     s+='<circle cx="'+m.x+'" cy="'+m.y+'" r="'+r+'" class="msite" fill="'+(TCOL[m.type]||TCOL.sin_datos)+'" stroke="'+minCol((m.minerals||[]).join(","))+'" data-ipt="mina:'+i+'"><title>'+esc(m.name+" · "+(m.minerals||[]).map(c=>MNAME[c]||c).join(", ")+" · "+(TLAB[m.type]||"Sin datos"))+"</title></circle>"});
   return s}
 function minLegend(){const out=[];if(isOn("minas")&&minSites().length)out.push('<span><i class="lg-dia" style="background:'+TCOL.publica+'"></i>Mina pública</span><span><i class="lg-dia" style="background:'+TCOL.mixta+'"></i>Mixta</span><span><i class="lg-dia" style="background:'+TCOL.privada+'"></i>Privada</span><span class="note">(borde: color del mineral)</span>');
-  if(isOn("yac")&&minDeps().length)out.push(minF==="all"?'<span>Yacimientos USGS: color por mineral</span>':'<span><i style="background:'+MCOL[minF]+'"></i>Yacimientos de '+esc(MNAME[minF]||minF)+"</span>");return out.join("")}
+  if(isOn("yac")&&minDeps().length)out.push(!minF.length?'<span>Yacimientos USGS: color por mineral</span>':minF.map(m=>'<span><i style="background:'+MCOL[m]+'"></i>Yacimientos de '+esc(MNAME[m]||m)+"</span>").join(""));return out.join("")}
 function minPick(kind,i){
   if(kind==="yac"){const d=minDeps()[i];if(!d)return"";const C=MR().cd||[];return '<div class="vinfo"><div class="label">Yacimiento · '+esc(C[d[4]]||"")+'</div><h4 class="vt">'+esc(d[2])+"</h4><p>"+String(d[3]).split(",").map(c=>'<span class="tpill" style="--c:'+(MCOL[c]||"#8D9BB0")+'">'+esc(MNAME[c]||c)+"</span>").join(" ")+'</p><p class="note">Yacimiento, mina o distrito seleccionado por el Servicio Geológico de EE. UU. No indica si está en operación hoy.</p><p class="note">Fuente: <a href="https://doi.org/10.5066/F7GH9GQR" target="_blank" rel="noopener">USGS, Global Distribution of Selected Mines, Deposits, and Districts of Critical Minerals (2018)</a> · dominio público</p>'+closePick()+"</div>"}
   const m=minSites()[i];if(!m)return"";return '<div class="vinfo"><div class="label">'+esc((m.kind==="refineria"?"Refinería":m.kind==="salar"?"Salar":m.kind==="proyecto"?"Proyecto":"Mina")+" · "+isoName(m.iso2))+'</div><h4 class="vt">'+esc(m.name)+"</h4>"+tpill(m.type||"sin_datos")+" "+(m.minerals||[]).map(c=>'<span class="tpill" style="--c:'+(MCOL[c]||"#8D9BB0")+'">'+esc(MNAME[c]||c)+"</span>").join(" ")+siteDet(m)+'<div class="desk-actions"><button class="btn" data-mingo="'+esc((m.minerals||[])[0]||"")+'">Ver la investigación del mineral</button><button class="btn" data-unpick>Cerrar</button></div></div>'}
@@ -1557,7 +1557,7 @@ document.addEventListener("click",e=>{
   if(e.target.closest("[data-invmore]")){invLim+=50;const l=$("#invlist");if(l)l.innerHTML=ownerList(cableStats());return}
   const f=e.target.closest("[data-invf]");if(f){invF=f.dataset.invf;invLim=25;renderViz();const l=$("#invlist");if(l&&e.target.closest(".sb-item"))l.scrollIntoView({behavior:"smooth",block:"start"});return}
   const mf=e.target.closest("[data-invmf]");if(mf){invMF=mf.dataset.invmf;renderViz();return}
-  const mfi=e.target.closest("[data-minf]");if(mfi){minF=mfi.dataset.minf;store.set("radar-minf",minF);renderViz();return}
+  const mfi=e.target.closest("[data-minf]");if(mfi){const v=mfi.dataset.minf;if(v==="all")minF=[];else{const i=minF.indexOf(v);if(i>=0)minF.splice(i,1);else minF.push(v)}store.set("radar-minf",minF);renderViz();return}
   const msl=e.target.closest("[data-minsel]");if(msl){minSel=msl.dataset.minsel;store.set("radar-minsel",minSel);minOpen=null;renderViz();return}
   const mop=e.target.closest("[data-minopen]");if(mop){const k=mop.dataset.minopen;minOpen=minOpen===k?null:k;renderViz();return}
   const mgo=e.target.closest("[data-mingo]");if(mgo){invTab="minerales";store.set("radar-invtab",invTab);if(mgo.dataset.mingo)minSel=mgo.dataset.mingo;view="inv";store.set("radar-view",view);mapPick=null;renderViz();return}
@@ -2796,7 +2796,7 @@ function globeMount(){const slot=$("#globe-slot");if(!slot)return;
   }).catch(()=>{const s=$("#globe-slot");if(s)s.innerHTML='<p class="note" style="padding:20px">No se pudo cargar el globo 3D en este navegador. Usa la vista plana.</p>'})}
 function globeSize(){if(!G3)return;const r=G3.host.parentNode&&G3.host.parentNode.getBoundingClientRect();if(!r||!r.width)return;G3.gl.width(r.width).height(Math.max(360,r.height))}
 function globeData(){if(!G3)return;const gl=G3.gl;const ts=visibleTopics();
-  const LT=gLight();const sig=JSON.stringify([LT,layerOn,mapSel,current&&current.id,ts.length,customLayers.length,typeof minFilter!=="undefined"?minFilter:0]);
+  const LT=gLight();const sig=JSON.stringify([LT,layerOn,mapSel,current&&current.id,ts.length,customLayers.length,minF]);
   if(sig!==G3sig){G3sig=sig;
     const LL=iso=>{const p=WORLD.pts[iso];if(!p)return null;const [lo,la]=invLL(p[0],p[1]);return {lat:la,lng:lo}};
     const byIso=globeByIso(), GS=isOn("geo")?geoStats(ts):null, gmax=GS?Math.max(1,...Object.values(GS).map(s=>s.score)):1, DC=isOn("dep")&&resHas("cm")?depCounts():{};
