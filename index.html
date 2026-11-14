@@ -491,6 +491,8 @@ body.fs-open{overflow:hidden}
 .tl-ev.r-latam:before{background:#F2B84B}.tl-ev.r-colombia:before{background:#FF7A5C}
 .tl-ev time{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}.tl-ev p{margin:3px 0}.tl-ev small{color:var(--muted)}
 @media (max-width:640px){.globesky{min-height:420px;height:62vh}.hb{grid-template-columns:96px 1fr 62px}.tl-ev{grid-template-columns:1fr}}
+.themeseg{background:var(--surface)}.themeseg button{color:var(--fg);opacity:.78}.themeseg button[aria-pressed="true"]{opacity:1;background:var(--fg);color:var(--bg);font-weight:600}
+@media (max-width:640px){.themeseg button{padding:6px 8px;font-size:12px}}
 .ikinds{margin:0 0 12px}.seg2 button:disabled{opacity:.38;cursor:not-allowed}.ikhint{margin:2px 0 6px;font-size:12.5px;color:var(--muted)}
 .iwrap{background:var(--sunk);border-radius:10px;padding:12px;display:grid;place-items:center}
 .iwrap canvas{max-width:100%;max-height:72vh;height:auto;border-radius:6px;box-shadow:0 6px 24px rgba(0,0,0,.25)}
@@ -617,6 +619,7 @@ body.resopen{overflow:hidden}
       <label class="label" for="ed">Ver</label>
       <select id="ed" aria-label="Elegir edición"><option>Cargando…</option></select>
       <span id="live" class="pill live" hidden>En vivo</span>
+      <div class="seg2 themeseg" role="group" aria-label="Apariencia"><button type="button" data-uitheme="light" title="Versión clara">☀ Clara</button><button type="button" data-uitheme="dark" title="Versión oscura">☾ Oscura</button><button type="button" data-uitheme="system" title="Según la configuración de tu dispositivo">◐ Sistema</button></div>
       <button class="btn setbtn" data-opensearch aria-label="Temas de búsqueda"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>Búsquedas</button>
       <button class="btn setbtn" data-openset aria-label="Configuración"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Historial</button>
     </div>
@@ -1201,7 +1204,9 @@ setInterval(pollReports,120000);
 setInterval(()=>{if(!document.hidden)refreshTimes()},60000);
 /* configuración del historial */
 function uiTheme(){return store.get("radar-uitheme")||"dark"}
-function setUiTheme(t){store.set("radar-uitheme",t);if(t==="system")document.documentElement.removeAttribute("data-theme");else document.documentElement.setAttribute("data-theme",t)}
+function setUiTheme(t){store.set("radar-uitheme",t);if(t==="system")document.documentElement.removeAttribute("data-theme");else document.documentElement.setAttribute("data-theme",t);syncThemeBtns();document.querySelectorAll('input[name="uitheme"]').forEach(i=>i.checked=i.value===t)}
+function syncThemeBtns(){const t=uiTheme();document.querySelectorAll("[data-uitheme]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.uitheme===t))}
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-uitheme]");if(b)setUiTheme(b.dataset.uitheme)});syncThemeBtns();
 document.addEventListener("change",e=>{if(e.target&&e.target.name==="uitheme")setUiTheme(e.target.value)});
 function renderSettings(){
   const p=$("#settings");if(!p)return;
@@ -2722,7 +2727,7 @@ function globeMount(){const slot=$("#globe-slot");if(!slot)return;
     const feats=topojson.feature(topo,topo.objects.countries).features.filter(f=>f.properties.name!=="Antarctica");feats.forEach(f=>{f.iso=N2ISO[f.id]||""});
     const gl=Globe({animateIn:false})(host).backgroundColor("rgba(0,0,0,0)").showAtmosphere(true).atmosphereColor("#5CC8FF").atmosphereAltitude(0.16)
       .globeMaterial(Object.assign(new (Globe.THREE||window.THREE||{MeshPhongMaterial:function(){}}).MeshPhongMaterial({color:"#0E1A33"}),{}))
-      .polygonsData(feats).polygonAltitude(0.004).polygonSideColor(()=>"rgba(0,0,0,0)").polygonStrokeColor(()=>"rgba(147,160,186,.35)")
+      .polygonsData(feats).polygonAltitude(0.004).polygonSideColor(()=>"rgba(0,0,0,0)").polygonStrokeColor(f=>f.iso===mapSel?"#FFFFFF":"rgba(147,160,186,.35)")
       .polygonLabel(f=>'<div class="gtip">'+esc(cname(f.iso)||f.properties.name)+"</div>")
       .onPolygonClick(f=>{if(!f.iso||!WORLD.pts[f.iso])return;mapPick=null;mapSel=mapSel===f.iso?null:f.iso;renderViz()})
       .pointLat("lat").pointLng("lng").pointColor("c").pointAltitude("a").pointRadius("r").pointResolution(6).pointLabel(p=>'<div class="gtip">'+esc(p.t)+"</div>")
@@ -2730,7 +2735,7 @@ function globeMount(){const slot=$("#globe-slot");if(!slot)return;
       .pathPoints("p").pathPointLat(x=>x[0]).pathPointLng(x=>x[1]).pathColor("c").pathStroke(0.6).pathLabel(p=>'<div class="gtip">'+esc(p.t)+"</div>").pathTransitionDuration(0)
       .onPathClick(p=>{mapPick=p.k;mapSel=null;renderViz()})
       .arcStartLat("a0").arcStartLng("o0").arcEndLat("a1").arcEndLng("o1").arcColor("c").arcStroke(0.5).arcAltitudeAutoScale(0.35).arcDashLength(0.5).arcDashGap(0.2).arcDashAnimateTime(4000)
-      .labelLat("lat").labelLng("lng").labelText("t").labelSize(0.55).labelDotRadius(0.28).labelColor(()=>"#E879A6").labelResolution(2).labelAltitude(0.01)
+      .labelLat("lat").labelLng("lng").labelText("t").labelSize(0.55).labelDotRadius(0.28).labelColor(()=>"rgba(255,255,255,.95)").labelResolution(2).labelAltitude(0.01)
       .onLabelClick(l=>{mapPick=l.k;mapSel=null;renderViz()})
       .particleLat("lat").particleLng("lng").particleAltitude("alt").particlesSize(1.6).particlesSizeAttenuation(false).particlesColor(d=>d.c)
       .particleLabel(d=>'<div class="gtip">'+esc(d.s.nm)+"<br><small>"+esc(d.s.op||d.s._c)+"</small></div>")
@@ -2747,8 +2752,9 @@ function globeData(){if(!G3)return;const gl=G3.gl;const ts=visibleTopics();
   if(sig!==G3sig){G3sig=sig;
     const LL=iso=>{const p=WORLD.pts[iso];if(!p)return null;const [lo,la]=invLL(p[0],p[1]);return {lat:la,lng:lo}};
     const byIso=globeByIso(), GS=isOn("geo")?geoStats(ts):null, gmax=GS?Math.max(1,...Object.values(GS).map(s=>s.score)):1, DC=isOn("dep")&&resHas("cm")?depCounts():{};
-    gl.polygonCapColor(f=>{const g=GS&&GS[f.iso];if(f.iso===mapSel)return"rgba(255,122,92,.75)";if(g)return geoColor(g.score,gmax);const dn=DC[f.iso];if(dn)return depColor(dn);
-      const l=byIso[f.iso];if(l)return "rgba(255,122,92,"+(0.22+Math.max(...l.map(x=>x.t.heat||1))*0.1).toFixed(2)+")";return "rgba(36,50,79,.92)"});
+    gl.polygonStrokeColor(f=>f.iso===mapSel?"#FFFFFF":"rgba(147,160,186,.35)");
+    gl.polygonCapColor(f=>{const g=GS&&GS[f.iso];if(f.iso===mapSel)return"rgba(140,156,255,.55)";if(g)return geoColor(g.score,gmax);const dn=DC[f.iso];if(dn)return depColor(dn);
+      const l=byIso[f.iso];if(l)return "rgba(255,122,92,"+(0.16+Math.max(...l.map(x=>x.t.heat||1))*0.07).toFixed(2)+")";return "rgba(36,50,79,.92)"});
     const pts=[],paths=[],arcs=[],labels=[];
     Object.keys(byIso).forEach(iso=>{const q=LL(iso);if(!q)return;const l=byIso[iso];pts.push({lat:q.lat,lng:q.lng,c:"#FF7A5C",a:0.02+l.length*0.025,r:0.45,t:WORLD.pts[iso][2]+" · "+l.length+" tema(s)",iso})});
     if(isOn("news"))ts.forEach((t,ti)=>{const g=(t.geo||[]).filter(x=>WORLD.pts[x.iso]);if(g.length<2)return;const a=LL(g[0].iso);g.slice(1).forEach(x=>{const b=LL(x.iso);if(a&&b)arcs.push({a0:a.lat,o0:a.lng,a1:b.lat,o1:b.lng,c:["rgba(255,122,92,.9)","rgba(255,122,92,.2)"]})})});
