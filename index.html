@@ -1586,7 +1586,7 @@ const BASE_LAYERS=[
   {id:"dep",label:"Dependencia de cables",desc:"Cuántos cables submarinos llegan a cada país: menos cables, más dependencia.",col:"#4FD1A5",res:"cm"},
   {id:"media",label:"Medios de comunicación",desc:"Sede de los principales medios y grupos, por tipo de propiedad.",col:"#FF8A65",res:"media"},
   {id:"minas",label:"Minas de minerales para la tecnología",desc:"Minas, salares y refinerías principales de tierras raras, litio, cobalto, cobre y otros, por tipo de propiedad.",col:"#FF5DA2",fn:()=>minSites().length>0},
-  {id:"polos",label:"Polos tecnológicos (Silicon Valley y similares)",desc:"Los ecosistemas tecnológicos más grandes del mundo según el ranking Startup Genome 2026, más los principales de América Latina.",col:"#E879A6",res:"hubs"},
+  {id:"polos",label:"Centros de industria de alta tecnología",desc:"Silicon Valley y los demás grandes centros de industria de alta tecnología del mundo según el ranking Startup Genome 2026, más los principales de América Latina.",col:"#E879A6",res:"hubs"},
   {id:"yac",label:"Yacimientos de minerales críticos (USGS)",desc:"2.121 minas, yacimientos y distritos de 22 minerales críticos, con color por mineral.",col:"#C792EA",fn:()=>minDeps().length>0}
 ];
 const infraHas=k=>!!(INFRA&&INFRA[k]&&INFRA[k].length);
@@ -2692,7 +2692,7 @@ function hubs(){return ((RES.hubs||{}).hubs)||[]}
 function hubsSVG(){if(!isOn("polos")||!hubs().length)return"";let s="";hubs().forEach((h,i)=>{const [x,y]=projLL(h.lon,h.lat);
   s+='<g class="hubmk" data-ipt="hub:'+i+'"><circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="4.2" class="hubpt"/>'+((h.rank&&h.rank<=10)||h.group==="latam"?'<text x="'+(x+5.5).toFixed(1)+'" y="'+(y+3).toFixed(1)+'" class="hublab">'+esc(h.name)+"</text>":"")+"<title>"+esc(h.name+(h.alias?" ("+h.alias+")":"")+(h.rank?" · puesto "+h.rank:""))+"</title></g>"});return s}
 function hubPick(i){const h=hubs()[i];if(!h)return"";const R=RES.hubs||{};const f=h.ficha||{};const L=(a)=>(a||[]).map(esc).join(" · ");
-  return '<div class="vinfo hubficha"><div class="label">Polo tecnológico'+(h.rank?" · puesto "+h.rank+" en el ranking global de Startup Genome 2026":h.startupblink_2026_rank?" · puesto "+h.startupblink_2026_rank+" en StartupBlink 2026":"")+'</div><h4 class="vt">'+esc(h.name)+"</h4>"+(h.alias&&h.alias!==h.name?'<p class="note">También conocido como «'+esc(h.alias)+"»</p>":"")+
+  return '<div class="vinfo hubficha"><div class="label">Centro de industria de alta tecnología'+(h.rank?" · puesto "+h.rank+" en el ranking global de Startup Genome 2026":h.startupblink_2026_rank?" · puesto "+h.startupblink_2026_rank+" en StartupBlink 2026":"")+'</div><h4 class="vt">'+esc(h.name)+"</h4>"+(h.alias&&h.alias!==h.name?'<p class="note">También conocido como «'+esc(h.alias)+"»</p>":"")+
     "<p>"+esc([h.city,isoName(h.iso2)].filter(Boolean).join(", "))+"</p>"+
     '<div class="label">Qué hacen</div><p>'+esc(f.que_hacen||h.known_for||"")+"</p>"+
     ((f.empresas||[]).length?'<div class="label">Quiénes están</div><p>'+L(f.empresas)+"</p>":"")+
@@ -2935,7 +2935,7 @@ function podFicha(){const F=FB(),W=PW();const [t,id]=[podPick.slice(0,2),podPick
     try{add("cables submarinos que llegan",nfmt(depCounts()[id]||0))}catch(_){}
     add("medios con dueño investigado",nfmt(((RES.media||[]).find(m=>m.iso3===id)||{outlets:[]}).outlets.length));
     try{add("minas y plantas de minerales en el radar",nfmt(minSites().filter(m=>m.iso2===c.iso2).length))}catch(_){}
-    add("polos tecnológicos",nfmt(hubs().filter(x=>x.iso2===c.iso2).length));
+    add("centros de industria de alta tecnología",nfmt(hubs().filter(x=>x.iso2===c.iso2).length));
     let nt=0;try{nt=(typeof allTopics==="function"?allTopics():topics()).filter(t=>(t.geo||[]).some(g=>g.iso===id)).length}catch(_){}add("temas del radar sobre el país",nfmt(nt));
     h='<div class="label">Ficha de país · '+esc(c.continent)+'</div><h4 class="fichah">'+esc(c.name)+"</h4>"+
       '<div class="kpis sm"><div class="kpi"><b>'+usdS(c.gdp_busd)+'</b><span>PIB '+(c.year||W.year)+'</span></div><div class="kpi"><b>#'+rk+'</b><span>en el mundo</span></div><div class="kpi"><b>'+big.length+'</b><span>empresas del top 100 con ventas mayores que su PIB</span></div></div>'+
