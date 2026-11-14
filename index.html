@@ -503,6 +503,7 @@ body.resopen{overflow:hidden}
 
 /* ===== investigación ===== */
 .board.mode-inv{grid-template-columns:1fr}
+.board.mode-wide{grid-template-columns:1fr}.board.mode-wide .desk,.board.mode-wide #desk{display:none}
 .board.mode-inv .desk,.board.mode-inv #desk{display:none}
 .inv-tabs button[aria-selected="true"]{background:var(--sky-ink);color:var(--sky)}
 .inv-tabs button{border:0;background:none;color:var(--sky-muted);padding:6px 12px;font-size:13px;cursor:pointer}
@@ -948,6 +949,7 @@ function openKey(key,toTab){
   if(f.r!==current){current=f.r;mapSel=null;activeRoute=null}
   if(region!=="all"&&f.t.region!==region){region="all";document.querySelectorAll(".chip").forEach(b=>b.setAttribute("aria-pressed",b.dataset.r==="all"))}
   topicId=f.t.id;tab=toTab||"analisis";
+  if(view==="mapa"||view==="inv"){view="lista";store.set("radar-view",view)}
   if(view==="galaxia")focus={type:"topic",key};
   renderAll();
   $("#board").classList.add("reading");
@@ -956,7 +958,7 @@ function openKey(key,toTab){
 
 function renderViz(){
   const box=$("#viz"), board=$("#board");
-  board.classList.toggle("mode-viz",view!=="lista");board.classList.toggle("mode-inv",view==="inv");
+  board.classList.toggle("mode-viz",view!=="lista");board.classList.toggle("mode-inv",view==="inv");board.classList.toggle("mode-wide",view==="inv"||view==="mapa");
   document.querySelectorAll("[data-view]").forEach(b=>b.setAttribute("aria-selected",b.dataset.view===view));
   box.hidden=view==="lista";
   if(view==="lista"||!current){box.innerHTML="";return}
