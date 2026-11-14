@@ -472,7 +472,7 @@ body.fs-open{overflow:hidden}
 .satbar:hover span{text-decoration:underline}
 .satinfo{border-top:1px solid var(--sky-line);padding-top:8px;display:grid;gap:4px}.satinfo p{margin:0}
 /* poder corporativo y línea de tiempo */
-.icard.pod,.icard.tl{display:grid;gap:10px}
+.icard.pod,.icard.tlcard{display:grid;gap:10px}
 .tscroll{overflow:auto;max-width:100%;border:1px solid var(--line);border-radius:8px}.tscroll.tall{max-height:560px}
 .ptable{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
 .ptable th,.ptable td{padding:7px 9px;border-bottom:1px solid var(--line);text-align:right;vertical-align:top}
@@ -548,7 +548,7 @@ body.resopen{overflow:hidden}
 .fmeta{display:flex;flex-wrap:wrap;gap:6px}
 .fichal{margin:0;padding-left:18px;display:grid;gap:4px}.fichal small{color:var(--sky-muted)}
 .icard.ficha{border-color:var(--sky-ink);scroll-margin-top:12px}.icard.ficha p{margin:0}
-.ptable td.tl,.ptable th.tl{text-align:left;max-width:260px}.ptable .owners{white-space:normal}
+.ptable td.tleft,.ptable th.tleft{text-align:left;max-width:260px}.ptable .owners{white-space:normal}
 .hubficha p{margin:0}
 .globesky .legend{position:absolute;left:10px;top:10px;right:64px;z-index:2;border:1px solid var(--sky-line);border-radius:8px;background:var(--sky-glass);color:var(--sky-muted);max-width:640px}
 .globesky .gstatus{top:auto;bottom:10px}
@@ -2926,8 +2926,8 @@ function invPoderHTML(){const F=FB(),P=PIB(),W=PW();if(!F||!W)return '<p class="
   h+='<section class="icard pod"><div class="label">Forbes Global 2000 · '+esc(F.edition)+'</div><h4>Las 100 empresas más grandes del mundo: sector, dueños y tipo de capital</h4>'+
     '<p class="note">Orden de Forbes, de mayor a menor. Capital: <b>pública</b> si el Estado tiene 50 % o más; <b>mixta</b> si tiene entre 10 % y 50 % o derechos especiales; <b>privada</b> en otro caso. En el top 100: '+Object.keys(OWNL).map(k=>(oc[k]||0)+" "+OWNL[k].toLowerCase()+"s").join(", ")+(oc.sin?", "+oc.sin+" en revisión":"")+'. Los filtros de sector y capital de arriba también aplican aquí. Toca una empresa para ver su ficha.</p>'+
     '<input id="podq" class="satq" type="search" placeholder="Buscar empresa, sector, país o dueño" value="'+esc(podQ)+'">'+
-    '<div class="tscroll tall"><table class="ptable"><thead><tr>'+th("rank","Puesto")+'<th scope="col">Empresa y sector</th><th scope="col">País</th>'+th("state","Capital")+'<th scope="col" class="tl">Dueños principales</th>'+th("sales","Ventas")+th("profits","Ganancias")+th("mv","Valor de mercado")+"</tr></thead><tbody>"+
-    L.map(r=>{const e=emp(r)||{};const ow=(e.owners||[]).filter(o=>o.kind!=="publico_disperso").slice(0,3);return "<tr"+(TECHIND.includes(r.industry)?' class="tech"':"")+"><td>"+r.rank+'</td><th scope="row"><button class="linkbtn" data-podpick="co:'+esc(r.rank+"|"+r.company)+'">'+esc(r.company)+"</button><small>"+esc(secOf(r))+"</small></th><td>"+esc(cn2(r.country))+"</td><td>"+ownPill(e.ownership)+(e.state_pct?"<small>"+nfmt(e.state_pct)+" % estatal</small>":"")+'</td><td class="tl"><small class="owners">'+(ow.length?ow.map(o=>esc(o.name.split(" (")[0])+(o.pct!=null?" "+nfmt(o.pct)+" %":"")).join(" · "):"—")+"</small></td><td>"+usdS(r.sales_busd)+"</td><td>"+usdS(r.profits_busd)+"</td><td>"+usdS(r.market_value_busd)+"</td></tr>"}).join("")+
+    '<div class="tscroll tall"><table class="ptable"><thead><tr>'+th("rank","Puesto")+'<th scope="col">Empresa y sector</th><th scope="col">País</th>'+th("state","Capital")+'<th scope="col" class="tleft">Dueños principales</th>'+th("sales","Ventas")+th("profits","Ganancias")+th("mv","Valor de mercado")+"</tr></thead><tbody>"+
+    L.map(r=>{const e=emp(r)||{};const ow=(e.owners||[]).filter(o=>o.kind!=="publico_disperso").slice(0,3);return "<tr"+(TECHIND.includes(r.industry)?' class="tech"':"")+"><td>"+r.rank+'</td><th scope="row"><button class="linkbtn" data-podpick="co:'+esc(r.rank+"|"+r.company)+'">'+esc(r.company)+"</button><small>"+esc(secOf(r))+"</small></th><td>"+esc(cn2(r.country))+"</td><td>"+ownPill(e.ownership)+(e.state_pct?"<small>"+nfmt(e.state_pct)+" % estatal</small>":"")+'</td><td class="tleft"><small class="owners">'+(ow.length?ow.map(o=>esc(o.name.split(" (")[0])+(o.pct!=null?" "+nfmt(o.pct)+" %":"")).join(" · "):"—")+"</small></td><td>"+usdS(r.sales_busd)+"</td><td>"+usdS(r.profits_busd)+"</td><td>"+usdS(r.market_value_busd)+"</td></tr>"}).join("")+
     "</tbody></table></div><p class=\"note\">Cifras en US$ (bill. = billones, millones de millones; mil M = miles de millones). Resaltadas: tecnológicas según Forbes (Amazon y Alibaba Forbes las clasifica como comercio). Dueños: informes anuales, registros ante reguladores y medios de referencia; cada ficha cita sus fuentes y la fecha del dato. Fuente de la lista: "+srcA(F.source_url,"Forbes")+" vía "+srcA((F.top100[0]||{}).src,"InsideIIM")+".</p></section>";
   return h}
 
@@ -2968,7 +2968,7 @@ function tlDate(d){d=String(d||"");const p=d.split("-");const M=["ene","feb","ma
 function tlEvents(){const T=TL();return T?(T.events||[]).filter(e=>(!tlReg||e.region===tlReg)&&(!tlTh||(e.themes||[]).includes(tlTh))).slice().sort((a,b)=>String(a.date).localeCompare(String(b.date))):[]}
 function invTiempoHTML(){const T=TL();if(!T)return '<p class="note">Datos en preparación.</p>';const E=tlEvents(),all=T.events||[];
   const rc={},tc={};all.forEach(e=>{rc[e.region]=(rc[e.region]||0)+1;(e.themes||[]).forEach(t=>tc[t]=(tc[t]||0)+1)});
-  let h='<section class="icard tl"><div class="podctl"><span class="label">Dónde</span><div class="seg2"><button data-tlreg="" aria-pressed="'+(!tlReg)+'">Todo · '+all.length+"</button>"+Object.keys(TLREG).filter(k=>rc[k]).map(k=>'<button data-tlreg="'+k+'" aria-pressed="'+(tlReg===k)+'">'+TLREG[k]+" · "+rc[k]+"</button>").join("")+"</div></div>"+
+  let h='<section class="icard tlcard"><div class="podctl"><span class="label">Dónde</span><div class="seg2"><button data-tlreg="" aria-pressed="'+(!tlReg)+'">Todo · '+all.length+"</button>"+Object.keys(TLREG).filter(k=>rc[k]).map(k=>'<button data-tlreg="'+k+'" aria-pressed="'+(tlReg===k)+'">'+TLREG[k]+" · "+rc[k]+"</button>").join("")+"</div></div>"+
     '<div class="satchips"><button class="gchip'+(!tlTh?" on":"")+'" data-tlth="">Todos los temas</button>'+Object.keys(TLTH).filter(k=>tc[k]).map(k=>'<button class="gchip'+(tlTh===k?" on":"")+'" data-tlth="'+k+'">'+TLTH[k]+" · "+tc[k]+"</button>").join("")+"</div>"+
     '<button class="btn" data-resopen="null">📊 Infografía de esta línea de tiempo</button></section><ol class="tline">';
   let dec="";E.forEach(e=>{const d=String(e.date).slice(0,3)+"0";if(d!==dec){dec=d;h+='<li class="tl-dec" aria-hidden="true">'+d+"s</li>"}
