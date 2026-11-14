@@ -1,1 +1,607 @@
-[{"at": "2026-10-28T09:47:00-05:00", "autor": "monitoreo", "cambios": {"biz": "", "conf": "baja", "note": "Medio digital independiente. El 27-10-2026 un tribunal de faltas de Nuevo Cairo ordenó su cierre y el decomiso de equipos por operar sin licencia; fallo de primera instancia, apelable.", "owner": "Sin datos verificados", "pct": null, "t": "sin_datos"}, "clave": "EG|Mada Masr", "fecha": "2026-10-27", "fuente": {"titulo": "CPJ: CPJ outraged by Egypt court conviction of journalist Lina Attalah, order of Mada Masr's closure", "url": "https://cpj.org/2026/10/cpj-outraged-by-egypt-court-conviction-of-journalist-lina-attalah-order-of-mada-masrs-closure/"}, "nota": "Orden judicial de cierre de Mada Masr y multa máxima a su directora por operar sin licencia (confirmado por CPJ, Reuters y Egyptian Streets).", "tipo": "medio", "id": "2026-10-27-mada-masr-cierre"}, {"at": "2026-10-28T10:41:00-05:00", "autor": "monitoreo", "cambios": {"conf": "media", "conflicts": "", "kind": "refineria", "minerals": ["REE"], "note": "Planta hidrometalúrgica para procesar monazita en cloruro mixto de tierras raras (meta ~12.000 t/año); pruebas y puesta en marcha previstas para el 1T de 2027. Hastings busca aprobación tailandesa para subir a 51 % o más; los demás accionistas de BZNM no se publican. Pago: hasta US$ 15 millones, incluidas 23 millones de acciones para Enuo Holdings.", "operator": "BZNM Co Ltd", "owners": [{"name": "Hastings Technology Metals", "pct": 49, "state": ""}], "state_holder": "", "state_pct": null, "status": "en construcción", "type": "privada"}, "clave": "Kabin Buri (BZNM)|TH", "fecha": "2026-10-27", "fuente": {"titulo": "Mining.com.au: Hastings seals stake in Thai rare earths plant for $21 million", "url": "https://mining.com.au/hastings-seals-stake-in-thai-rare-earths-plant-for-21-million"}, "nota": "Hastings Technology Metals completó la compra del 49 % de BZNM, dueña de la planta de tierras raras de Kabin Buri (Tailandia).", "tipo": "mina", "id": "2026-10-27-hastings-kabin-buri"}, {"at": "2026-10-28T11:50:00-05:00", "autor": "monitoreo", "cambios": {"conf": "media", "conflicts": "", "kind": "proyecto", "minerals": ["Li"], "note": "Proyecto de espodumeno con licencia minera ratificada por el Parlamento de Ghana (marzo de 2026) y permisos de operación; sin decisión final de construcción publicada. Huayou asumió el 22,5 % que tenía Elevra Lithium y los derechos de compra del concentrado; puede llegar al 50 % tras financiar US$ 66 millones. Además ofrece comprar Atlantic Lithium (votación en noviembre). La participación del Estado ghanés no figura en las fuentes consultadas.", "operator": "Atlantic Lithium", "owners": [{"name": "Zhejiang Huayou Cobalt", "pct": 22.5, "state": ""}, {"name": "Atlantic Lithium", "pct": null, "state": ""}], "state_holder": "", "state_pct": null, "status": "en exploración", "type": "sin_datos"}, "clave": "Ewoyaa|GH", "fecha": "2026-10-26", "fuente": {"titulo": "Atlantic Lithium: Completion of Novation Agreement", "url": "https://www.investegate.co.uk/announcement/rns/atlantic-lithium-limited-npv-di---all/completion-of-novation-agreement/9840002"}, "nota": "Huayou (China) completó la toma del 22,5 % de Elevra en el proyecto de litio Ewoyaa, el que sería la primera mina de litio de Ghana, con opción de subir al 50 %.", "tipo": "mina", "id": "2026-10-26-ewoyaa-huayou"}, {"at": "2026-10-29T11:45:00-05:00", "autor": "monitoreo", "cambios": {"conf": "media", "conflicts": "", "kind": "proyecto", "minerals": ["Li"], "note": "Critical Metals (Nasdaq: CRML) absorbe el 100 % de European Lithium (ASX: EUR) por esquemas aprobados por la Corte Suprema de Australia Occidental; implementación el 5 nov. 2026 y salida de EUR de la ASX el 6 nov. La empresa presenta Wolfsberg (Carintia) como proyecto de litio con todos los permisos; el estado exacto de obra y el % resultante no se publican. Critical Metals también controla Tanbreez (tierras raras, Groenlandia).", "operator": "Critical Metals Corp.", "owners": [{"name": "Critical Metals Corp.", "pct": null, "state": ""}], "state_holder": "", "state_pct": null, "status": "en construcción", "type": "privada"}, "clave": "Wolfsberg|AT", "fecha": "2026-10-27", "fuente": {"titulo": "Critical Metals Corp: Critical Metals Corp. Acquisition of European Lithium Becomes Effective", "url": "https://www.criticalmetalscorp.com/critical-metals-corp-acquisition-of-european-lithium-becomes-effective/"}, "nota": "Entra en vigor la compra del 100 % de European Lithium por Critical Metals Corp., que consolida la cadena de propiedad del proyecto de litio Wolfsberg (Austria).", "tipo": "mina", "id": "2026-10-27-wolfsberg-critical-metals"}, {"at": "2026-11-01T06:45:52-05:00", "autor": "monitoreo", "cambios": {"biz": "Estudios Paramount y Warner Bros., CBS, HBO; Larry Ellison es cofundador de Oracle", "conf": "baja", "note": "Cierre de la compra de Warner Bros. Discovery (unos 110.000 millones de dólares) confirmado por varios medios el 6-10-2026. Antes del cierre se reportó que fondos soberanos de Arabia Saudí, Catar y EAU tendrían cerca de 38,5 % sin voto; no verificado tras el cierre, por eso pct null.", "owner": "Paramount Skydance (dirigida por David Ellison)", "pct": null, "t": "sin_datos"}, "clave": "US|CNN", "fecha": "2026-10-06", "fuente": {"titulo": "NBC News: Paramount completes $110B Warner Bros. merger to form Skydance", "url": "https://www.nbcnews.com/business/media/paramount-warner-bros-skydance-closes-rcna601833"}, "id": "2026-10-06-cnn-paramount-skydance", "nota": "CNN pasa a manos de Paramount Skydance tras cerrarse la compra de Warner Bros. Discovery (confirmado por NBC News, The New York Times, Axios y France 24).", "tipo": "medio"}, {"at": "2026-11-01T10:31:00-05:00", "autor": "revision-semanal", "cambios": {"k": ["AZE", "KAZ"], "o": ["AzerTelecom (NEQSOL Holding)", "Kazakhtelecom"], "p": false, "y": 2026}, "clave": "Trans-Caspian Fiber-Optic Cable (CaspiLink)", "fecha": "2026-10-15", "fuente": {"titulo": "Trend: Digital Silk Way reaches major milestone: Official launch ceremony of Trans-Caspian Fiber-Optic Cable held", "url": "https://www.trend.az/azerbaijan/4235694.html"}, "nota": "Inaugurado el cable submarino Sumgayit (Azerbaiyán)–Aktau (Kazajistán), unos 380 km, construido por la empresa conjunta CaspiLink B.V. de AzerTelecom y Kazakhtelecom; también lo reporta Submarine Networks (21-10-2026).", "tipo": "cable", "id": "2026-10-15-caspilink-transcaspio"}, {"at": "2026-11-01T10:31:00-05:00", "autor": "revision-semanal", "cambios": {"conf": "media", "g": "Investment Corporation of Solomon Islands (ICSI)", "h": "Gobierno de Islas Salomón vía ICSI (51 %); SINPF, fondo nacional de previsión, 49 %", "iso2": "SB", "kind": "gobierno", "note": "Acuerdo de accionistas de 2018: ICSI 51 % y SINPF 49 %; la empresa participa en Coral Sea en nombre del Gobierno. ICSI es la corporación estatal de inversiones creada por ley; el 49 % del SINPF no se cuenta como estatal aquí.", "pct": 51, "t": "publica"}, "clave": "Solomon Island Submarine Cable Company", "fecha": "2018-07-20", "fuente": {"titulo": "SISCC: ICSI and SINPF sign historic shareholders agreement in SISCC", "url": "https://siscc.com.sb/media/2018/7/20/icsi-and-sinpf-sign-historic-shareholders-agreement-in-solomon-islands-submarine-cable-company-limited-and-purchase-their-shares-in-the-company"}, "nota": "Accionistas de SISCC: ICSI (Estado) 51 % y SINPF 49 %.", "tipo": "cable_owner", "id": "2026-11-01-siscc"}, {"at": "2026-11-01T10:31:00-05:00", "autor": "revision-semanal", "cambios": {"conf": "media", "g": "National Telecom Public Co. (NT), fusión de TOT y CAT Telecom (2021)", "h": "Ministerio de Finanzas de Tailandia", "iso2": "TH", "kind": "telecom", "note": "Empresa estatal; Bangkok Post informó que la entidad fusionada tendría 100 % en manos del Ministerio de Finanzas; Yozzo la describe como empresa estatal bajo el Ministerio de Economía Digital.", "pct": 100, "t": "publica"}, "clave": "National Telecom", "fecha": "2020-03-01", "fuente": {"titulo": "Bangkok Post: The path to National Telecom", "url": "https://www.bangkokpost.com/business/general/1874689"}, "nota": "Se confirma con prensa de referencia que NT es 100 % estatal (antes solo Wikipedia).", "tipo": "cable_owner", "id": "2026-11-01-national-telecom-th"}, {"at": "2026-11-01T10:31:00-05:00", "autor": "revision-semanal", "cambios": {"k": ["IRL", "FRA", "ESP", "PRT"], "o": ["Orange", "Equitix", "MDM"], "p": true, "y": 2028}, "clave": "PISCES", "fecha": "2026-10-14", "fuente": {"titulo": "Light Reading: Equitix, MDM and Orange form JV to deliver PISCES subsea cable system with financial support of European Union", "url": "https://www.lightreading.com/cable-technology/equitix-mdm-and-orange-form-jv-to-deliver-pisces-subsea-cable-system-with-financial-support-of-european-union"}, "nota": "Orange, Equitix y MDM crean la empresa conjunta PISCES Cable System Ltd. para un cable de ~3.125 km Galway–Saint-Hilaire-de-Riez–Sopelana–Carcavelos con apoyo del CEF de la UE; despliegue previsto en 2028; participaciones no publicadas (también en Submarine Networks).", "tipo": "cable", "id": "2026-10-14-pisces-cable"}, {"at": "2026-11-01T10:31:00-05:00", "autor": "revision-semanal", "cambios": {"conf": "media", "note": "MIND ID tomó 65 % de TINS (2023, Bisnis.com). Desde el 13-02-2026 la empresa es PT Timah (Persero) Tbk tras la reforma de la ley de empresas estatales (UU 16/2025): el Estado conserva la acción Dwiwarna y el resto de la participación estatal la gestiona Danantara (IMA, 19-02-2026).", "operator": "PT Timah (Persero) Tbk", "owners": [{"name": "MIND ID (holding minero estatal)", "pct": 65, "state": "Estado de Indonesia"}, {"name": "Acción Serie A Dwiwarna", "pct": null, "state": "Estado de Indonesia"}], "state_holder": "MIND ID / Danantara (Indonesia)", "state_pct": 65, "type": "publica"}, "clave": "Concesiones de PT Timah en Bangka-Belitung|ID", "fecha": "2026-02-19", "fuente": {"titulo": "Bisnis.com: MIND ID Ambil Alih 65 Persen Saham Timah (TINS)", "url": "https://market.bisnis.com/read/20230329/192/1641668/mind-id-ambil-alih-65-persen-saham-timah-tins-rp885-triliun"}, "nota": "Se confirma 65 % estatal (MIND ID) en PT Timah y su nuevo estatus de Persero desde febrero de 2026 (pública).", "tipo": "mina", "id": "2026-11-01-pt-timah-mind-id"}, {"at": "2026-11-01T10:31:00-05:00", "autor": "revision-semanal", "cambios": {"conf": "media", "note": "Compra de 2022 por US$180 M: Sinomine adquirió 74 % y anunció que compraría al resto (no verificado). Caixin describe a Sinomine como filial del estatal China Nonferrous Metal Mining Group; por confirmar con registros de Sinomine antes de clasificar como estatal.", "operator": "Bikita Minerals (Sinomine)", "owners": [{"name": "Sinomine Resource Group (vía dos sociedades de Mauricio)", "pct": 74, "state": ""}, {"name": "Dzikamai Mavhaire", "pct": 16, "state": ""}, {"name": "Nehemiah Mutendi", "pct": 5.25, "state": ""}], "state_holder": "", "state_pct": null, "type": "sin_datos"}, "clave": "Bikita|ZW", "fecha": "2022-02-14", "fuente": {"titulo": "Mining Index Zimbabwe: China's Sinomine joins queue of lithium buyers with US$180m deal for Bikita Minerals", "url": "https://www.miningindex.co.zw/2022/02/14/chinas-sinomine-joins-queue-of-lithium-buyers-with-us180m-deal-for-bikita-minerals/"}, "nota": "Bikita: Sinomine con 74 % (no 100 %), según Mining Index y Caixin; el resto en manos de accionistas zimbabuenses.", "tipo": "mina", "id": "2026-11-01-bikita"}, {"at": "2026-11-01T10:31:00-05:00", "autor": "revision-semanal", "cambios": {"conf": "media", "note": "Según anuncio de Shenghe (mayo de 2025, SMM): Ngualla es 84 % Peak y 16 % Tanzania; Shenghe tenía 19,9 % de Peak, suscribió 50 % de Ngualla Group UK y acordó comprar 100 % de Peak por A$158 M. No se verificó el cierre de esa compra ni si Shenghe tiene control estatal chino.", "owners": [{"name": "Ngualla Group UK (Peak Rare Earths; Shenghe)", "pct": 84, "state": ""}, {"name": "Gobierno de Tanzania", "pct": 16, "state": "Estado de Tanzania"}], "state_holder": "Gobierno de Tanzania", "state_pct": 16, "type": "mixta"}, "clave": "Ngualla|TZ", "fecha": "2025-05-15", "fuente": {"titulo": "SMM: Shenghe Resources accelerates its overseas rare earth resources layout", "url": "https://news.metal.com/newscontent/103325535-shenghe-resources-accelerates-its-overseas-rare-earth-resources-layout-increases-stake-in-core-rare-earth-project-of-target-company-which-is-expected-to-go-into-production-next-year"}, "nota": "Se confirma el reparto 84 % (Peak/Shenghe) y 16 % Estado tanzano en Ngualla.", "tipo": "mina", "id": "2026-11-01-ngualla"}, {"at": "2026-11-01T10:31:00-05:00", "autor": "revision-semanal", "cambios": {"conf": "alta", "note": "Reconciliado con la página de Lithium Argentina.", "operator": "Minera Exar", "owners": [{"name": "Ganfeng Lithium", "pct": 46.7, "state": ""}, {"name": "Lithium Argentina", "pct": 44.8, "state": ""}, {"name": "JEMSE", "pct": 8.5, "state": "Provincia de Jujuy, Argentina"}], "production_note": "Etapa 1: 40.000 t/a de carbonato de litio grado batería, en operación desde 2024; Etapa 2 (otras 40.000 t/a) en prefactibilidad.", "state_holder": "JEMSE (Jujuy Energía y Minería Sociedad del Estado)", "state_pct": 8.5, "status": "en operación", "type": "privada"}, "clave": "Cauchari-Olaroz (Minera Exar)|AR", "fecha": "2026-11-01", "fuente": {"titulo": "Lithium Argentina: Cauchari-Olaroz", "url": "https://lithium-argentina.com/projects/cauchari-olaroz"}, "nota": "Se verifica la propiedad de Cauchari-Olaroz: Ganfeng 46,7 %, Lithium Argentina 44,8 % y JEMSE 8,5 % (privada, 8,5 % estatal provincial).", "tipo": "mina", "id": "2026-11-01-cauchari-olaroz"}, {"at": "2026-11-01T10:31:00-05:00", "autor": "revision-semanal", "cambios": {"conf": "media", "g": "Faroese Telecom (Føroya Tele)", "h": "Gobierno de las Islas Feroe (vía Faroese Telecom / Føroya Tele)", "iso2": "FO", "kind": "telecom", "note": "Shefa es filial 100 % de Faroese Telecom (fuente: shefa.fo); que el Gobierno feroés posee 100 % de Føroya Tele consta en Wikipedia, por confirmar con fuente primaria. Dueña de SHEFA-2, CANTAT-3 y Hronn.", "pct": 100, "t": "publica"}, "clave": "Shefa", "fecha": "2026-11-01", "fuente": {"titulo": "Shefa: About Shefa", "url": "https://www.shefa.fo/?p=64"}, "nota": "Shefa es filial 100 % de la telefónica estatal de las Islas Feroe.", "tipo": "cable_owner", "id": "2026-11-01-shefa"}, {"at": "2026-11-01T10:31:00-05:00", "autor": "revision-semanal", "cambios": {"biz": "", "conf": "media", "note": "Tras la fusión registrada el 5-12-2022, Carbe S.A.S. quedó con 86,28 % de RCN Televisión; la empresa dijo que no cambió el control ni el beneficiario final (OAL).", "owner": "Organización Ardila Lülle (familia Ardila), vía Carbe S.A.S. (86,28 %)", "pct": null, "t": "privada"}, "clave": "CO|RCN Televisión", "fecha": "2022-12-07", "fuente": {"titulo": "Valora Analitik: Sociedad Carbe de los Ardila Lülle se convierte en el mayor accionista de RCN Televisión", "url": "https://www.valoraanalitik.com/?p=218954"}, "nota": "Se actualiza el dato antiguo: Carbe S.A.S. (Ardila Lülle) tiene 86,28 % de RCN Televisión.", "tipo": "medio", "id": "2026-11-01-rcn-television"}, {"at": "2026-11-01T10:31:00-05:00", "autor": "revision-semanal", "cambios": {"conf": "media", "g": "GITGE", "h": "Estado de Guinea Ecuatorial", "iso2": "GQ", "kind": "gobierno", "note": "Empresa pública creada por decreto presidencial del 26-01-2011 para gestionar la infraestructura pública de telecomunicaciones (Ceiba-1, Ceiba-2, Ultramar; capacidad en SAIL). No se publica el % exacto.", "pct": null, "t": "publica"}, "clave": "GITGE (Gestor de Infraestructuras de Telecomunicaciones de Guinea Ecuatorial)", "fecha": "2026-08-06", "fuente": {"titulo": "El Independiente: Un país que pasó del satélite a la fibra óptica (historia de GITGE)", "url": "https://www.elindependiente.com/eli/2026/08/06/la-historia-de-gitge-y-la-huella-del-dr-oscar-ondo-en-guinea-ecuatorial/amp/"}, "nota": "GITGE es empresa pública del Estado ecuatoguineano (también descrita así por btw.media).", "tipo": "cable_owner", "id": "2026-11-01-gitge"}, {"at": "2026-11-01T10:31:00-05:00", "autor": "revision-semanal", "cambios": {"conf": "alta", "g": "Viettel Military Industry and Telecoms Group", "h": "Estado de Vietnam (Ministerio de Defensa Nacional)", "iso2": "VN", "kind": "telecom", "note": "Decreto 05/2018/ND-CP (estatuto): empresa de defensa 100 % estatal, gestionada directamente por el Ministerio de Defensa Nacional.", "pct": 100, "t": "publica"}, "clave": "Viettel Corporation", "fecha": "2018-01-05", "fuente": {"titulo": "Decreto 05/2018/ND-CP sobre el estatuto de Viettel", "url": "https://hethongphapluat.com/decree-no-05-2018-nd-cp-dated-january-05-2018-on-the-charter-of-viettel.html"}, "nota": "Se confirma con fuente primaria (decreto) que Viettel es 100 % estatal.", "tipo": "cable_owner", "id": "2026-11-01-viettel"}, {"at": "2026-11-01T10:31:00-05:00", "autor": "revision-semanal", "cambios": {"k": ["CHL", "AUS"], "o": ["Google", "Desarrollo País (Chile)"], "p": true, "y": 2028}, "clave": "Humboldt", "fecha": "2026-06-29", "fuente": {"titulo": "Developing Telecoms: Humboldt cable gets go-ahead from Chile", "url": "https://developingtelecoms.com/telecom-technology/optical-fixed-networks/20454-humboldt-cable-gets-go-ahead-from-chile.html"}, "nota": "Cable Chile–Australia de Google y la estatal chilena Desarrollo País, no figuraba en el índice; instalación prevista desde el 4T de 2026 y operación en 2028 (otros reportes mencionan escala en Polinesia Francesa, no verificada aquí).", "tipo": "cable", "id": "2026-06-29-humboldt-cable"}, {"at": "2026-11-01T10:31:00-05:00", "autor": "revision-semanal", "cambios": {"conf": "baja", "g": "GlobalConnect (fondos EQT Infrastructure III y IV; minoritaria de Mubadala, EAU)", "h": "", "iso2": "NO", "kind": "mayorista", "note": "EQT Infrastructure es el mayor accionista; Mubadala (fondo soberano de Abu Dabi) compró una participación minoritaria en 2022 cuyo % no se publica, por lo que podría ser mixta si supera 10 %. Hubo reportes de venta por EQT.", "pct": null, "t": "privada"}, "clave": "GlobalConnect Norway (incl. Homenet and Lynet)", "fecha": "2022-10-14", "fuente": {"titulo": "Mubadala: EQT Infrastructure broadens investor base in GlobalConnect", "url": "https://www.mubadala.com/en/news/eqt-infrastructure-broadens-investor-base-globalconnect"}, "nota": "Se documenta la matriz de GlobalConnect: fondos de EQT Infrastructure (mayoritarios) y minoritaria de Mubadala sin % publicado.", "tipo": "cable_owner", "id": "2026-11-01-globalconnect-norway"}, {"at": "2026-11-01T10:31:00-05:00", "autor": "revision-semanal", "cambios": {"conf": "alta", "note": "Glencore transfirió en 2024 el 5 % al Estado congoleño, como exige el Código Minero de 2018; resuelve la duda 75/25 de pendientes.", "operator": "Kamoto Copper Company (Glencore)", "owners": [{"name": "Glencore", "pct": 70, "state": ""}, {"name": "Gécamines", "pct": 25, "state": "Estado de RD Congo"}, {"name": "Estado de RD Congo", "pct": 5, "state": "Estado de RD Congo"}], "state_holder": "Gécamines (25 %) y Estado congoleño directo (5 %)", "state_pct": 30, "type": "mixta"}, "clave": "Kamoto Copper Company (KCC)|CD", "fecha": "2024-12-31", "fuente": {"titulo": "Kamoto Copper Company: Who we are", "url": "https://kamotocoppercompany.com/en/who-we-are"}, "nota": "KCC: Glencore 70 %, Gécamines 25 % y Estado de RDC 5 % (participación estatal total 30 %, mixta).", "tipo": "mina", "id": "2026-11-01-kcc-accionistas"}, {"at": "2026-11-01T10:31:00-05:00", "autor": "revision-semanal", "cambios": {"conf": "media", "note": "Cifras de 2018 (Financial Afrik; BHRRC da las mismas); entonces se hablaba de que Gabón podría subir a 35 %, no verificado. Además, el 12-10-2026 se anunció que el Estado francés (APE) pasará a ser el primer accionista de Eramet con una ampliación de capital de 500 M€, prevista antes de fin de 2026 (% no publicados), lo que elevaría la participación estatal indirecta.", "operator": "Comilog (Eramet)", "owners": [{"name": "Eramet", "pct": 63.71, "state": ""}, {"name": "Estado gabonés", "pct": 28.94, "state": "Estado de Gabón"}, {"name": "Accionistas privados", "pct": 7.35, "state": ""}], "state_holder": "Estado de Gabón (directo)", "state_pct": 28.94, "type": "mixta"}, "clave": "Moanda (Comilog)|GA", "fecha": "2026-10-12", "fuente": {"titulo": "Financial Afrik: Gabon: good results for Comilog in the first quarter of 2018", "url": "https://www.financialafrik.com/en/?p=460142"}, "nota": "Comilog: Eramet 63,71 %, Estado gabonés 28,94 % (mixta); el Estado francés anunció que será el primer accionista de Eramet (Fortuneo, 12-10-2026).", "tipo": "mina", "id": "2026-11-01-moanda-comilog"}, {"at": "2026-11-01T10:31:00-05:00", "autor": "revision-semanal", "cambios": {"biz": "", "conf": "media", "note": "Valora Analitik (abril de 2026) confirma que Caracol TV hace parte del Grupo Valorem; fue el único canal rentable en 2025. % no publicados.", "owner": "Grupo Valorem (familia Santo Domingo)", "pct": null, "t": "privada"}, "clave": "CO|Caracol Televisión", "fecha": "2026-04-24", "fuente": {"titulo": "Valora Analitik: resultados 2025 de los medios de comunicación en Colombia", "url": "https://www.valoraanalitik.com/?p=574819"}, "nota": "Se confirma en 2026 que Caracol Televisión sigue en el Grupo Valorem de la familia Santo Domingo (coincide con Media Ownership Monitor).", "tipo": "medio", "id": "2026-11-01-caracol-television"}]
+[
+ {
+  "at": "2026-11-01T10:31:00-05:00",
+  "autor": "revision-semanal",
+  "cambios": {
+   "k": [
+    "CHL",
+    "AUS"
+   ],
+   "o": [
+    "Google",
+    "Desarrollo País (Chile)"
+   ],
+   "p": true,
+   "y": 2028
+  },
+  "clave": "Humboldt",
+  "fecha": "2026-06-29",
+  "fuente": {
+   "titulo": "Developing Telecoms: Humboldt cable gets go-ahead from Chile",
+   "url": "https://developingtelecoms.com/telecom-technology/optical-fixed-networks/20454-humboldt-cable-gets-go-ahead-from-chile.html"
+  },
+  "nota": "Cable Chile–Australia de Google y la estatal chilena Desarrollo País, no figuraba en el índice; instalación prevista desde el 4T de 2026 y operación en 2028 (otros reportes mencionan escala en Polinesia Francesa, no verificada aquí).",
+  "tipo": "cable",
+  "id": "2026-06-29-humboldt-cable"
+ },
+ {
+  "at": "2026-11-01T10:31:00-05:00",
+  "autor": "revision-semanal",
+  "cambios": {
+   "k": [
+    "IRL",
+    "FRA",
+    "ESP",
+    "PRT"
+   ],
+   "o": [
+    "Orange",
+    "Equitix",
+    "MDM"
+   ],
+   "p": true,
+   "y": 2028
+  },
+  "clave": "PISCES",
+  "fecha": "2026-10-14",
+  "fuente": {
+   "titulo": "Light Reading: Equitix, MDM and Orange form JV to deliver PISCES subsea cable system with financial support of European Union",
+   "url": "https://www.lightreading.com/cable-technology/equitix-mdm-and-orange-form-jv-to-deliver-pisces-subsea-cable-system-with-financial-support-of-european-union"
+  },
+  "nota": "Orange, Equitix y MDM crean la empresa conjunta PISCES Cable System Ltd. para un cable de ~3.125 km Galway–Saint-Hilaire-de-Riez–Sopelana–Carcavelos con apoyo del CEF de la UE; despliegue previsto en 2028; participaciones no publicadas (también en Submarine Networks).",
+  "tipo": "cable",
+  "id": "2026-10-14-pisces-cable"
+ },
+ {
+  "at": "2026-11-01T10:31:00-05:00",
+  "autor": "revision-semanal",
+  "cambios": {
+   "k": [
+    "AZE",
+    "KAZ"
+   ],
+   "o": [
+    "AzerTelecom (NEQSOL Holding)",
+    "Kazakhtelecom"
+   ],
+   "p": false,
+   "y": 2026
+  },
+  "clave": "Trans-Caspian Fiber-Optic Cable (CaspiLink)",
+  "fecha": "2026-10-15",
+  "fuente": {
+   "titulo": "Trend: Digital Silk Way reaches major milestone: Official launch ceremony of Trans-Caspian Fiber-Optic Cable held",
+   "url": "https://www.trend.az/azerbaijan/4235694.html"
+  },
+  "nota": "Inaugurado el cable submarino Sumgayit (Azerbaiyán)–Aktau (Kazajistán), unos 380 km, construido por la empresa conjunta CaspiLink B.V. de AzerTelecom y Kazakhtelecom; también lo reporta Submarine Networks (21-10-2026).",
+  "tipo": "cable",
+  "id": "2026-10-15-caspilink-transcaspio"
+ },
+ {
+  "at": "2026-10-28T11:50:00-05:00",
+  "autor": "monitoreo",
+  "cambios": {
+   "conf": "media",
+   "conflicts": "",
+   "kind": "proyecto",
+   "minerals": [
+    "Li"
+   ],
+   "note": "Proyecto de espodumeno con licencia minera ratificada por el Parlamento de Ghana (marzo de 2026) y permisos de operación; sin decisión final de construcción publicada. Huayou asumió el 22,5 % que tenía Elevra Lithium y los derechos de compra del concentrado; puede llegar al 50 % tras financiar US$ 66 millones. Además ofrece comprar Atlantic Lithium (votación en noviembre). La participación del Estado ghanés no figura en las fuentes consultadas.",
+   "operator": "Atlantic Lithium",
+   "owners": [
+    {
+     "name": "Zhejiang Huayou Cobalt",
+     "pct": 22.5,
+     "state": ""
+    },
+    {
+     "name": "Atlantic Lithium",
+     "pct": null,
+     "state": ""
+    }
+   ],
+   "state_holder": "",
+   "state_pct": null,
+   "status": "en exploración",
+   "type": "sin_datos"
+  },
+  "clave": "Ewoyaa|GH",
+  "fecha": "2026-10-26",
+  "fuente": {
+   "titulo": "Atlantic Lithium: Completion of Novation Agreement",
+   "url": "https://www.investegate.co.uk/announcement/rns/atlantic-lithium-limited-npv-di---all/completion-of-novation-agreement/9840002"
+  },
+  "nota": "Huayou (China) completó la toma del 22,5 % de Elevra en el proyecto de litio Ewoyaa, el que sería la primera mina de litio de Ghana, con opción de subir al 50 %.",
+  "tipo": "mina",
+  "id": "2026-10-26-ewoyaa-huayou"
+ },
+ {
+  "at": "2026-10-28T10:41:00-05:00",
+  "autor": "monitoreo",
+  "cambios": {
+   "conf": "media",
+   "conflicts": "",
+   "kind": "refineria",
+   "minerals": [
+    "REE"
+   ],
+   "note": "Planta hidrometalúrgica para procesar monazita en cloruro mixto de tierras raras (meta ~12.000 t/año); pruebas y puesta en marcha previstas para el 1T de 2027. Hastings busca aprobación tailandesa para subir a 51 % o más; los demás accionistas de BZNM no se publican. Pago: hasta US$ 15 millones, incluidas 23 millones de acciones para Enuo Holdings.",
+   "operator": "BZNM Co Ltd",
+   "owners": [
+    {
+     "name": "Hastings Technology Metals",
+     "pct": 49,
+     "state": ""
+    }
+   ],
+   "state_holder": "",
+   "state_pct": null,
+   "status": "en construcción",
+   "type": "privada"
+  },
+  "clave": "Kabin Buri (BZNM)|TH",
+  "fecha": "2026-10-27",
+  "fuente": {
+   "titulo": "Mining.com.au: Hastings seals stake in Thai rare earths plant for $21 million",
+   "url": "https://mining.com.au/hastings-seals-stake-in-thai-rare-earths-plant-for-21-million"
+  },
+  "nota": "Hastings Technology Metals completó la compra del 49 % de BZNM, dueña de la planta de tierras raras de Kabin Buri (Tailandia).",
+  "tipo": "mina",
+  "id": "2026-10-27-hastings-kabin-buri"
+ },
+ {
+  "at": "2026-10-28T09:47:00-05:00",
+  "autor": "monitoreo",
+  "cambios": {
+   "biz": "",
+   "conf": "baja",
+   "note": "Medio digital independiente. El 27-10-2026 un tribunal de faltas de Nuevo Cairo ordenó su cierre y el decomiso de equipos por operar sin licencia; fallo de primera instancia, apelable.",
+   "owner": "Sin datos verificados",
+   "pct": null,
+   "t": "sin_datos"
+  },
+  "clave": "EG|Mada Masr",
+  "fecha": "2026-10-27",
+  "fuente": {
+   "titulo": "CPJ: CPJ outraged by Egypt court conviction of journalist Lina Attalah, order of Mada Masr's closure",
+   "url": "https://cpj.org/2026/10/cpj-outraged-by-egypt-court-conviction-of-journalist-lina-attalah-order-of-mada-masrs-closure/"
+  },
+  "nota": "Orden judicial de cierre de Mada Masr y multa máxima a su directora por operar sin licencia (confirmado por CPJ, Reuters y Egyptian Streets).",
+  "tipo": "medio",
+  "id": "2026-10-27-mada-masr-cierre"
+ },
+ {
+  "at": "2026-10-29T11:45:00-05:00",
+  "autor": "monitoreo",
+  "cambios": {
+   "conf": "media",
+   "conflicts": "",
+   "kind": "proyecto",
+   "minerals": [
+    "Li"
+   ],
+   "note": "Critical Metals (Nasdaq: CRML) absorbe el 100 % de European Lithium (ASX: EUR) por esquemas aprobados por la Corte Suprema de Australia Occidental; implementación el 5 nov. 2026 y salida de EUR de la ASX el 6 nov. La empresa presenta Wolfsberg (Carintia) como proyecto de litio con todos los permisos; el estado exacto de obra y el % resultante no se publican. Critical Metals también controla Tanbreez (tierras raras, Groenlandia).",
+   "operator": "Critical Metals Corp.",
+   "owners": [
+    {
+     "name": "Critical Metals Corp.",
+     "pct": null,
+     "state": ""
+    }
+   ],
+   "state_holder": "",
+   "state_pct": null,
+   "status": "en construcción",
+   "type": "privada"
+  },
+  "clave": "Wolfsberg|AT",
+  "fecha": "2026-10-27",
+  "fuente": {
+   "titulo": "Critical Metals Corp: Critical Metals Corp. Acquisition of European Lithium Becomes Effective",
+   "url": "https://www.criticalmetalscorp.com/critical-metals-corp-acquisition-of-european-lithium-becomes-effective/"
+  },
+  "nota": "Entra en vigor la compra del 100 % de European Lithium por Critical Metals Corp., que consolida la cadena de propiedad del proyecto de litio Wolfsberg (Austria).",
+  "tipo": "mina",
+  "id": "2026-10-27-wolfsberg-critical-metals"
+ },
+ {
+  "at": "2026-11-01T10:31:00-05:00",
+  "autor": "revision-semanal",
+  "cambios": {
+   "conf": "media",
+   "note": "Compra de 2022 por US$180 M: Sinomine adquirió 74 % y anunció que compraría al resto (no verificado). Caixin describe a Sinomine como filial del estatal China Nonferrous Metal Mining Group; por confirmar con registros de Sinomine antes de clasificar como estatal.",
+   "operator": "Bikita Minerals (Sinomine)",
+   "owners": [
+    {
+     "name": "Sinomine Resource Group (vía dos sociedades de Mauricio)",
+     "pct": 74,
+     "state": ""
+    },
+    {
+     "name": "Dzikamai Mavhaire",
+     "pct": 16,
+     "state": ""
+    },
+    {
+     "name": "Nehemiah Mutendi",
+     "pct": 5.25,
+     "state": ""
+    }
+   ],
+   "state_holder": "",
+   "state_pct": null,
+   "type": "sin_datos"
+  },
+  "clave": "Bikita|ZW",
+  "fecha": "2022-02-14",
+  "fuente": {
+   "titulo": "Mining Index Zimbabwe: China's Sinomine joins queue of lithium buyers with US$180m deal for Bikita Minerals",
+   "url": "https://www.miningindex.co.zw/2022/02/14/chinas-sinomine-joins-queue-of-lithium-buyers-with-us180m-deal-for-bikita-minerals/"
+  },
+  "nota": "Bikita: Sinomine con 74 % (no 100 %), según Mining Index y Caixin; el resto en manos de accionistas zimbabuenses.",
+  "tipo": "mina",
+  "id": "2026-11-01-bikita"
+ },
+ {
+  "at": "2026-11-01T10:31:00-05:00",
+  "autor": "revision-semanal",
+  "cambios": {
+   "biz": "",
+   "conf": "media",
+   "note": "Valora Analitik (abril de 2026) confirma que Caracol TV hace parte del Grupo Valorem; fue el único canal rentable en 2025. % no publicados.",
+   "owner": "Grupo Valorem (familia Santo Domingo)",
+   "pct": null,
+   "t": "privada"
+  },
+  "clave": "CO|Caracol Televisión",
+  "fecha": "2026-04-24",
+  "fuente": {
+   "titulo": "Valora Analitik: resultados 2025 de los medios de comunicación en Colombia",
+   "url": "https://www.valoraanalitik.com/?p=574819"
+  },
+  "nota": "Se confirma en 2026 que Caracol Televisión sigue en el Grupo Valorem de la familia Santo Domingo (coincide con Media Ownership Monitor).",
+  "tipo": "medio",
+  "id": "2026-11-01-caracol-television"
+ },
+ {
+  "at": "2026-11-01T10:31:00-05:00",
+  "autor": "revision-semanal",
+  "cambios": {
+   "conf": "alta",
+   "note": "Reconciliado con la página de Lithium Argentina.",
+   "operator": "Minera Exar",
+   "owners": [
+    {
+     "name": "Ganfeng Lithium",
+     "pct": 46.7,
+     "state": ""
+    },
+    {
+     "name": "Lithium Argentina",
+     "pct": 44.8,
+     "state": ""
+    },
+    {
+     "name": "JEMSE",
+     "pct": 8.5,
+     "state": "Provincia de Jujuy, Argentina"
+    }
+   ],
+   "production_note": "Etapa 1: 40.000 t/a de carbonato de litio grado batería, en operación desde 2024; Etapa 2 (otras 40.000 t/a) en prefactibilidad.",
+   "state_holder": "JEMSE (Jujuy Energía y Minería Sociedad del Estado)",
+   "state_pct": 8.5,
+   "status": "en operación",
+   "type": "privada"
+  },
+  "clave": "Cauchari-Olaroz (Minera Exar)|AR",
+  "fecha": "2026-11-01",
+  "fuente": {
+   "titulo": "Lithium Argentina: Cauchari-Olaroz",
+   "url": "https://lithium-argentina.com/projects/cauchari-olaroz"
+  },
+  "nota": "Se verifica la propiedad de Cauchari-Olaroz: Ganfeng 46,7 %, Lithium Argentina 44,8 % y JEMSE 8,5 % (privada, 8,5 % estatal provincial).",
+  "tipo": "mina",
+  "id": "2026-11-01-cauchari-olaroz"
+ },
+ {
+  "at": "2026-11-01T10:31:00-05:00",
+  "autor": "revision-semanal",
+  "cambios": {
+   "conf": "media",
+   "g": "GITGE",
+   "h": "Estado de Guinea Ecuatorial",
+   "iso2": "GQ",
+   "kind": "gobierno",
+   "note": "Empresa pública creada por decreto presidencial del 26-01-2011 para gestionar la infraestructura pública de telecomunicaciones (Ceiba-1, Ceiba-2, Ultramar; capacidad en SAIL). No se publica el % exacto.",
+   "pct": null,
+   "t": "publica"
+  },
+  "clave": "GITGE (Gestor de Infraestructuras de Telecomunicaciones de Guinea Ecuatorial)",
+  "fecha": "2026-08-06",
+  "fuente": {
+   "titulo": "El Independiente: Un país que pasó del satélite a la fibra óptica (historia de GITGE)",
+   "url": "https://www.elindependiente.com/eli/2026/08/06/la-historia-de-gitge-y-la-huella-del-dr-oscar-ondo-en-guinea-ecuatorial/amp/"
+  },
+  "nota": "GITGE es empresa pública del Estado ecuatoguineano (también descrita así por btw.media).",
+  "tipo": "cable_owner",
+  "id": "2026-11-01-gitge"
+ },
+ {
+  "at": "2026-11-01T10:31:00-05:00",
+  "autor": "revision-semanal",
+  "cambios": {
+   "conf": "baja",
+   "g": "GlobalConnect (fondos EQT Infrastructure III y IV; minoritaria de Mubadala, EAU)",
+   "h": "",
+   "iso2": "NO",
+   "kind": "mayorista",
+   "note": "EQT Infrastructure es el mayor accionista; Mubadala (fondo soberano de Abu Dabi) compró una participación minoritaria en 2022 cuyo % no se publica, por lo que podría ser mixta si supera 10 %. Hubo reportes de venta por EQT.",
+   "pct": null,
+   "t": "privada"
+  },
+  "clave": "GlobalConnect Norway (incl. Homenet and Lynet)",
+  "fecha": "2022-10-14",
+  "fuente": {
+   "titulo": "Mubadala: EQT Infrastructure broadens investor base in GlobalConnect",
+   "url": "https://www.mubadala.com/en/news/eqt-infrastructure-broadens-investor-base-globalconnect"
+  },
+  "nota": "Se documenta la matriz de GlobalConnect: fondos de EQT Infrastructure (mayoritarios) y minoritaria de Mubadala sin % publicado.",
+  "tipo": "cable_owner",
+  "id": "2026-11-01-globalconnect-norway"
+ },
+ {
+  "at": "2026-11-01T10:31:00-05:00",
+  "autor": "revision-semanal",
+  "cambios": {
+   "conf": "alta",
+   "note": "Glencore transfirió en 2024 el 5 % al Estado congoleño, como exige el Código Minero de 2018; resuelve la duda 75/25 de pendientes.",
+   "operator": "Kamoto Copper Company (Glencore)",
+   "owners": [
+    {
+     "name": "Glencore",
+     "pct": 70,
+     "state": ""
+    },
+    {
+     "name": "Gécamines",
+     "pct": 25,
+     "state": "Estado de RD Congo"
+    },
+    {
+     "name": "Estado de RD Congo",
+     "pct": 5,
+     "state": "Estado de RD Congo"
+    }
+   ],
+   "state_holder": "Gécamines (25 %) y Estado congoleño directo (5 %)",
+   "state_pct": 30,
+   "type": "mixta"
+  },
+  "clave": "Kamoto Copper Company (KCC)|CD",
+  "fecha": "2024-12-31",
+  "fuente": {
+   "titulo": "Kamoto Copper Company: Who we are",
+   "url": "https://kamotocoppercompany.com/en/who-we-are"
+  },
+  "nota": "KCC: Glencore 70 %, Gécamines 25 % y Estado de RDC 5 % (participación estatal total 30 %, mixta).",
+  "tipo": "mina",
+  "id": "2026-11-01-kcc-accionistas"
+ },
+ {
+  "at": "2026-11-01T10:31:00-05:00",
+  "autor": "revision-semanal",
+  "cambios": {
+   "conf": "media",
+   "note": "Cifras de 2018 (Financial Afrik; BHRRC da las mismas); entonces se hablaba de que Gabón podría subir a 35 %, no verificado. Además, el 12-10-2026 se anunció que el Estado francés (APE) pasará a ser el primer accionista de Eramet con una ampliación de capital de 500 M€, prevista antes de fin de 2026 (% no publicados), lo que elevaría la participación estatal indirecta.",
+   "operator": "Comilog (Eramet)",
+   "owners": [
+    {
+     "name": "Eramet",
+     "pct": 63.71,
+     "state": ""
+    },
+    {
+     "name": "Estado gabonés",
+     "pct": 28.94,
+     "state": "Estado de Gabón"
+    },
+    {
+     "name": "Accionistas privados",
+     "pct": 7.35,
+     "state": ""
+    }
+   ],
+   "state_holder": "Estado de Gabón (directo)",
+   "state_pct": 28.94,
+   "type": "mixta"
+  },
+  "clave": "Moanda (Comilog)|GA",
+  "fecha": "2026-10-12",
+  "fuente": {
+   "titulo": "Financial Afrik: Gabon: good results for Comilog in the first quarter of 2018",
+   "url": "https://www.financialafrik.com/en/?p=460142"
+  },
+  "nota": "Comilog: Eramet 63,71 %, Estado gabonés 28,94 % (mixta); el Estado francés anunció que será el primer accionista de Eramet (Fortuneo, 12-10-2026).",
+  "tipo": "mina",
+  "id": "2026-11-01-moanda-comilog"
+ },
+ {
+  "at": "2026-11-01T10:31:00-05:00",
+  "autor": "revision-semanal",
+  "cambios": {
+   "conf": "media",
+   "g": "National Telecom Public Co. (NT), fusión de TOT y CAT Telecom (2021)",
+   "h": "Ministerio de Finanzas de Tailandia",
+   "iso2": "TH",
+   "kind": "telecom",
+   "note": "Empresa estatal; Bangkok Post informó que la entidad fusionada tendría 100 % en manos del Ministerio de Finanzas; Yozzo la describe como empresa estatal bajo el Ministerio de Economía Digital.",
+   "pct": 100,
+   "t": "publica"
+  },
+  "clave": "National Telecom",
+  "fecha": "2020-03-01",
+  "fuente": {
+   "titulo": "Bangkok Post: The path to National Telecom",
+   "url": "https://www.bangkokpost.com/business/general/1874689"
+  },
+  "nota": "Se confirma con prensa de referencia que NT es 100 % estatal (antes solo Wikipedia).",
+  "tipo": "cable_owner",
+  "id": "2026-11-01-national-telecom-th"
+ },
+ {
+  "at": "2026-11-01T10:31:00-05:00",
+  "autor": "revision-semanal",
+  "cambios": {
+   "conf": "media",
+   "note": "Según anuncio de Shenghe (mayo de 2025, SMM): Ngualla es 84 % Peak y 16 % Tanzania; Shenghe tenía 19,9 % de Peak, suscribió 50 % de Ngualla Group UK y acordó comprar 100 % de Peak por A$158 M. No se verificó el cierre de esa compra ni si Shenghe tiene control estatal chino.",
+   "owners": [
+    {
+     "name": "Ngualla Group UK (Peak Rare Earths; Shenghe)",
+     "pct": 84,
+     "state": ""
+    },
+    {
+     "name": "Gobierno de Tanzania",
+     "pct": 16,
+     "state": "Estado de Tanzania"
+    }
+   ],
+   "state_holder": "Gobierno de Tanzania",
+   "state_pct": 16,
+   "type": "mixta"
+  },
+  "clave": "Ngualla|TZ",
+  "fecha": "2025-05-15",
+  "fuente": {
+   "titulo": "SMM: Shenghe Resources accelerates its overseas rare earth resources layout",
+   "url": "https://news.metal.com/newscontent/103325535-shenghe-resources-accelerates-its-overseas-rare-earth-resources-layout-increases-stake-in-core-rare-earth-project-of-target-company-which-is-expected-to-go-into-production-next-year"
+  },
+  "nota": "Se confirma el reparto 84 % (Peak/Shenghe) y 16 % Estado tanzano en Ngualla.",
+  "tipo": "mina",
+  "id": "2026-11-01-ngualla"
+ },
+ {
+  "at": "2026-11-01T10:31:00-05:00",
+  "autor": "revision-semanal",
+  "cambios": {
+   "conf": "media",
+   "note": "MIND ID tomó 65 % de TINS (2023, Bisnis.com). Desde el 13-02-2026 la empresa es PT Timah (Persero) Tbk tras la reforma de la ley de empresas estatales (UU 16/2025): el Estado conserva la acción Dwiwarna y el resto de la participación estatal la gestiona Danantara (IMA, 19-02-2026).",
+   "operator": "PT Timah (Persero) Tbk",
+   "owners": [
+    {
+     "name": "MIND ID (holding minero estatal)",
+     "pct": 65,
+     "state": "Estado de Indonesia"
+    },
+    {
+     "name": "Acción Serie A Dwiwarna",
+     "pct": null,
+     "state": "Estado de Indonesia"
+    }
+   ],
+   "state_holder": "MIND ID / Danantara (Indonesia)",
+   "state_pct": 65,
+   "type": "publica"
+  },
+  "clave": "Concesiones de PT Timah en Bangka-Belitung|ID",
+  "fecha": "2026-02-19",
+  "fuente": {
+   "titulo": "Bisnis.com: MIND ID Ambil Alih 65 Persen Saham Timah (TINS)",
+   "url": "https://market.bisnis.com/read/20230329/192/1641668/mind-id-ambil-alih-65-persen-saham-timah-tins-rp885-triliun"
+  },
+  "nota": "Se confirma 65 % estatal (MIND ID) en PT Timah y su nuevo estatus de Persero desde febrero de 2026 (pública).",
+  "tipo": "mina",
+  "id": "2026-11-01-pt-timah-mind-id"
+ },
+ {
+  "at": "2026-11-01T10:31:00-05:00",
+  "autor": "revision-semanal",
+  "cambios": {
+   "biz": "",
+   "conf": "media",
+   "note": "Tras la fusión registrada el 5-12-2022, Carbe S.A.S. quedó con 86,28 % de RCN Televisión; la empresa dijo que no cambió el control ni el beneficiario final (OAL).",
+   "owner": "Organización Ardila Lülle (familia Ardila), vía Carbe S.A.S. (86,28 %)",
+   "pct": null,
+   "t": "privada"
+  },
+  "clave": "CO|RCN Televisión",
+  "fecha": "2022-12-07",
+  "fuente": {
+   "titulo": "Valora Analitik: Sociedad Carbe de los Ardila Lülle se convierte en el mayor accionista de RCN Televisión",
+   "url": "https://www.valoraanalitik.com/?p=218954"
+  },
+  "nota": "Se actualiza el dato antiguo: Carbe S.A.S. (Ardila Lülle) tiene 86,28 % de RCN Televisión.",
+  "tipo": "medio",
+  "id": "2026-11-01-rcn-television"
+ },
+ {
+  "at": "2026-11-01T10:31:00-05:00",
+  "autor": "revision-semanal",
+  "cambios": {
+   "conf": "media",
+   "g": "Faroese Telecom (Føroya Tele)",
+   "h": "Gobierno de las Islas Feroe (vía Faroese Telecom / Føroya Tele)",
+   "iso2": "FO",
+   "kind": "telecom",
+   "note": "Shefa es filial 100 % de Faroese Telecom (fuente: shefa.fo); que el Gobierno feroés posee 100 % de Føroya Tele consta en Wikipedia, por confirmar con fuente primaria. Dueña de SHEFA-2, CANTAT-3 y Hronn.",
+   "pct": 100,
+   "t": "publica"
+  },
+  "clave": "Shefa",
+  "fecha": "2026-11-01",
+  "fuente": {
+   "titulo": "Shefa: About Shefa",
+   "url": "https://www.shefa.fo/?p=64"
+  },
+  "nota": "Shefa es filial 100 % de la telefónica estatal de las Islas Feroe.",
+  "tipo": "cable_owner",
+  "id": "2026-11-01-shefa"
+ },
+ {
+  "at": "2026-11-01T10:31:00-05:00",
+  "autor": "revision-semanal",
+  "cambios": {
+   "conf": "media",
+   "g": "Investment Corporation of Solomon Islands (ICSI)",
+   "h": "Gobierno de Islas Salomón vía ICSI (51 %); SINPF, fondo nacional de previsión, 49 %",
+   "iso2": "SB",
+   "kind": "gobierno",
+   "note": "Acuerdo de accionistas de 2018: ICSI 51 % y SINPF 49 %; la empresa participa en Coral Sea en nombre del Gobierno. ICSI es la corporación estatal de inversiones creada por ley; el 49 % del SINPF no se cuenta como estatal aquí.",
+   "pct": 51,
+   "t": "publica"
+  },
+  "clave": "Solomon Island Submarine Cable Company",
+  "fecha": "2018-07-20",
+  "fuente": {
+   "titulo": "SISCC: ICSI and SINPF sign historic shareholders agreement in SISCC",
+   "url": "https://siscc.com.sb/media/2018/7/20/icsi-and-sinpf-sign-historic-shareholders-agreement-in-solomon-islands-submarine-cable-company-limited-and-purchase-their-shares-in-the-company"
+  },
+  "nota": "Accionistas de SISCC: ICSI (Estado) 51 % y SINPF 49 %.",
+  "tipo": "cable_owner",
+  "id": "2026-11-01-siscc"
+ },
+ {
+  "at": "2026-11-01T10:31:00-05:00",
+  "autor": "revision-semanal",
+  "cambios": {
+   "conf": "alta",
+   "g": "Viettel Military Industry and Telecoms Group",
+   "h": "Estado de Vietnam (Ministerio de Defensa Nacional)",
+   "iso2": "VN",
+   "kind": "telecom",
+   "note": "Decreto 05/2018/ND-CP (estatuto): empresa de defensa 100 % estatal, gestionada directamente por el Ministerio de Defensa Nacional.",
+   "pct": 100,
+   "t": "publica"
+  },
+  "clave": "Viettel Corporation",
+  "fecha": "2018-01-05",
+  "fuente": {
+   "titulo": "Decreto 05/2018/ND-CP sobre el estatuto de Viettel",
+   "url": "https://hethongphapluat.com/decree-no-05-2018-nd-cp-dated-january-05-2018-on-the-charter-of-viettel.html"
+  },
+  "nota": "Se confirma con fuente primaria (decreto) que Viettel es 100 % estatal.",
+  "tipo": "cable_owner",
+  "id": "2026-11-01-viettel"
+ }
+]
