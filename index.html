@@ -272,7 +272,9 @@ footer{border-top:1px solid var(--line);padding-block:18px 28px;color:var(--mute
 .sadd input{font:inherit;font-size:14px;background:var(--surface);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%}
 .sadd input:focus{outline:2px solid var(--accent);outline-offset:-1px}
 /* navegación visual */
-:root{--sky:#0B1222;--sky-2:#14203A;--sky-ink:#E8ECF6;--sky-muted:#93A0BA;--sky-land:#24324F;--sky-line:#33456B}
+:root{--sky:#0B1222;--sky-2:#14203A;--sky-ink:#E8ECF6;--sky-muted:#93A0BA;--sky-land:#24324F;--sky-line:#33456B;--sky-hi:#FFFFFF;--sky-link:#9FB0FF;--sky-warn:#F2C46B;--sky-hot:#FF9A80;--sky-glass:rgba(11,18,34,.86);--sky-ll:#C9D2FF}
+:root[data-theme="light"]{--sky:#F4F7FB;--sky-2:#FFFFFF;--sky-ink:#111827;--sky-muted:#4B5567;--sky-land:#D3DCE8;--sky-line:#C6D0DE;--sky-hi:#111827;--sky-link:#2B44D6;--sky-warn:#8A5600;--sky-hot:#B93A1C;--sky-glass:rgba(255,255,255,.92);--sky-ll:#5B6BB8}
+@media (prefers-color-scheme: light){:root:not([data-theme]){--sky:#F4F7FB;--sky-2:#FFFFFF;--sky-ink:#111827;--sky-muted:#4B5567;--sky-land:#D3DCE8;--sky-line:#C6D0DE;--sky-hi:#111827;--sky-link:#2B44D6;--sky-warn:#8A5600;--sky-hot:#B93A1C;--sky-glass:rgba(255,255,255,.92);--sky-ll:#5B6BB8}}
 .views{display:inline-flex;background:var(--sunk);border-radius:10px;padding:3px;gap:2px}
 .views button{display:inline-flex;align-items:center;gap:6px;border:0;background:none;border-radius:8px;padding:6px 12px;font-size:13.5px;cursor:pointer;color:var(--muted)}
 .views button[aria-selected="true"]{background:var(--surface);color:var(--fg);font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.08)}
@@ -296,11 +298,11 @@ footer{border-top:1px solid var(--line);padding-block:18px 28px;color:var(--mute
 .land.hot{fill:#FF7A5C;cursor:pointer}
 .land.hot:hover{stroke:var(--sky-ink);stroke-width:.8}
 .land.sel{stroke:#8C9CFF;stroke-width:1.4}
-.land.picked{stroke:#fff;stroke-width:1.6}
+.land.picked{stroke:var(--sky-hi);stroke-width:1.6}
 .arc{fill:none;stroke-width:1.6;opacity:.75}
 .arc.on{stroke-width:2.6;opacity:1}
 .arc.dim,.mk.dim{opacity:.22}
-.routearc{fill:none;stroke:#fff;stroke-width:2;stroke-dasharray:5 5;animation:dash 1.2s linear infinite}
+.routearc{fill:none;stroke:var(--sky-hi);stroke-width:2;stroke-dasharray:5 5;animation:dash 1.2s linear infinite}
 @keyframes dash{to{stroke-dashoffset:-20}}
 .mk{cursor:pointer}
 .mk .halo{fill:#FF7A5C;opacity:.18}
@@ -308,7 +310,7 @@ footer{border-top:1px solid var(--line);padding-block:18px 28px;color:var(--mute
 .mk .dot.rel{fill:var(--sky);stroke:#FF7A5C;stroke-width:2}
 .mk:hover .halo,.mk:focus .halo{opacity:.4}
 .mklab,.nlab,.hublab{font-family:var(--f-body);font-size:11px;fill:var(--sky-ink);text-anchor:middle;paint-order:stroke;stroke:var(--sky);stroke-width:3px;stroke-linejoin:round;pointer-events:none}
-.stepmk circle,.stepc{fill:#fff}
+.stepmk circle,.stepc{fill:var(--sky-hi)}
 .stepmk text,.stept{font-family:var(--f-mono);font-size:10px;font-weight:600;fill:var(--sky);text-anchor:middle;pointer-events:none}
 .minec{fill:#F2B84B}
 .legend{display:flex;flex-wrap:wrap;gap:6px 14px;padding:8px 12px;font-size:11.5px;color:var(--sky-muted);border-top:1px solid var(--sky-line)}
@@ -322,7 +324,7 @@ footer{border-top:1px solid var(--line);padding-block:18px 28px;color:var(--mute
 .globs{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .gchip,.rchip,.thchip{border:1px solid var(--sky-line);background:transparent;color:var(--sky-ink);border-radius:999px;padding:4px 11px;font-size:12.5px;cursor:pointer}
 .gchip:hover,.rchip:hover,.thchip:hover{border-color:var(--sky-ink)}
-.rchip[aria-pressed="true"]{background:#fff;color:var(--sky);border-color:#fff}
+.rchip[aria-pressed="true"]{background:var(--sky-hi);color:var(--sky);border-color:var(--sky-hi)}
 .rchip.build{border-style:dashed}
 .rchip.mine{border-color:#F2B84B}
 .routes{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
@@ -338,19 +340,19 @@ footer{border-top:1px solid var(--line);padding-block:18px 28px;color:var(--mute
 .vitem .heat i{background:var(--sky-line)}.vitem .heat i.on{background:#FF7A5C}
 .rsteps{list-style:none;margin:4px 0 0;padding:0;display:grid;gap:6px}
 .rsteps .vitem{grid-template-columns:auto minmax(0,1fr)}
-.stepn{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:#fff;color:var(--sky);font-family:var(--f-mono);font-size:11px}
+.stepn{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--sky-hi);color:var(--sky);font-family:var(--f-mono);font-size:11px}
 .conns{list-style:none;margin:0;padding:0;display:grid;gap:8px}
 .conns li{display:grid;gap:2px;font-size:13.5px;border-left:2px solid #8C9CFF;padding-left:10px}
 .conns span{color:var(--sky-muted)}
 .linkish{background:none;border:0;padding:0;color:var(--sky-ink);font-weight:600;text-align:left;cursor:pointer;text-decoration:underline;text-decoration-color:var(--sky-line);text-underline-offset:3px}
 .thchips{display:flex;flex-wrap:wrap;gap:6px}
-.star{fill:#fff;opacity:.35}
+.star{fill:var(--sky-hi);opacity:.35}
 .tl{stroke-width:.8;opacity:.28}
 .tl.on{opacity:.85;stroke-width:1.4}.tl.dim{opacity:.06}
-.ll{fill:none;stroke:#C9D2FF;stroke-width:1.2;opacity:.5}
+.ll{fill:none;stroke:var(--sky-ll);stroke-width:1.2;opacity:.5}
 .ll.cont{stroke-dasharray:4 4;stroke:var(--sky-muted)}
-.ll.on{stroke:#fff;stroke-width:2.4;opacity:1}.ll.dim{opacity:.1}
-.rpath{fill:none;stroke:#fff;stroke-width:2.4;stroke-dasharray:6 6;animation:dash 1.2s linear infinite}
+.ll.on{stroke:var(--sky-hi);stroke-width:2.4;opacity:1}.ll.dim{opacity:.1}
+.rpath{fill:none;stroke:var(--sky-hi);stroke-width:2.4;stroke-dasharray:6 6;animation:dash 1.2s linear infinite}
 .hub{cursor:pointer}
 .hub .ring{stroke-width:1.5;opacity:.6}
 .hub .core{opacity:.9}
@@ -455,10 +457,10 @@ body.fs-open{overflow:hidden}
 .globeslot,.globehost{position:absolute;inset:0}
 .globehost canvas{display:block;outline:none}
 .gstatus{position:absolute;left:12px;top:10px;margin:0;color:var(--sky-muted);font-size:12.5px;pointer-events:none}
-.gtip{background:rgba(11,18,34,.92);color:#E8ECF6;border:1px solid #33456B;border-radius:6px;padding:4px 8px;font:12px/1.35 system-ui,sans-serif;max-width:260px}
-.gtip small{color:#93A0BA}
+.gtip{background:var(--sky-glass);color:var(--sky-ink);border:1px solid var(--sky-line);border-radius:6px;padding:4px 8px;font:12px/1.35 system-ui,sans-serif;max-width:260px}
+.gtip small{color:var(--sky-muted)}
 .zctl button[aria-pressed="true"]{background:var(--sky-ink);color:var(--sky)}
-.hubpt{fill:#E879A6;stroke:#0B1222;stroke-width:.8}.hublab{fill:#F6C6DA;font-size:8.5px;font-weight:600;paint-order:stroke;stroke:#0B1222;stroke-width:2px;pointer-events:none}.hubmk{cursor:pointer}
+.hubpt{fill:#E879A6;stroke:var(--sky);stroke-width:.8}.hublab{font-size:8.5px;font-weight:600;text-anchor:start}.hubmk{cursor:pointer}
 .satpanel{gap:8px}.satrow{display:flex;align-items:center;gap:10px}
 .satchips{display:flex;flex-wrap:wrap;gap:6px}.satchips .gchip i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:-1px}
 .gchip.on{background:var(--sky-ink);color:var(--sky);border-color:var(--sky-ink)}
@@ -530,24 +532,27 @@ body.resopen{overflow:hidden}
 .icard .ptable th,.icard .ptable td{border-bottom-color:var(--sky-line)}
 .icard .ptable thead th{background:var(--sky-2);color:var(--sky-muted)}
 .icard .ptable th[scope=row] small,.icard .ptable td small{color:var(--sky-muted)}
-.icard .ptable tr.tech th[scope=row]{color:#FF9A80}
+.icard .ptable tr.tech th[scope=row]{color:var(--sky-hot)}
 .icard .ptable thead .linkbtn{color:var(--sky-muted)}.icard .ptable thead .linkbtn[aria-pressed="true"]{color:var(--sky-ink)}
-.icard .ptable a,.icard .note a{color:#9FB0FF}
-.icard .note{color:var(--sky-muted)}.icard .warnline{color:#F2C46B}
+.icard .ptable a,.icard .note a,.icard a{color:var(--sky-link)}
+.icard .note{color:var(--sky-muted)}.icard .warnline{color:var(--sky-warn)}
 .icard .satq{background:var(--sky);color:var(--sky-ink);border-color:var(--sky-line)}.icard .satq::placeholder{color:var(--sky-muted)}
 .icard .gchip{color:var(--sky-ink)}
-.globesky .legend{position:absolute;left:10px;top:10px;right:64px;z-index:2;border:1px solid var(--sky-line);border-radius:8px;background:rgba(11,18,34,.86);color:#C9D2E3;max-width:640px}
+.globesky .legend{position:absolute;left:10px;top:10px;right:64px;z-index:2;border:1px solid var(--sky-line);border-radius:8px;background:var(--sky-glass);color:var(--sky-muted);max-width:640px}
 .globesky .gstatus{top:auto;bottom:10px}
 .satrow .sw{flex:none}.sw .track{background:#5B6780}
 .vinfo,.icard,.lpanel{color:var(--sky-ink)}
 .vinfo .note,.vinfo .label,.icard .label,.lpanel .note,.lpanel .label,.lpanel small{color:var(--sky-muted)}
-.vinfo a,.lpanel a{color:#9FB0FF}
+.vinfo a,.lpanel a,.sky a{color:var(--sky-link)}
 
 .hb{display:grid;grid-template-columns:minmax(120px,240px) minmax(0,1fr) minmax(90px,auto);gap:10px;align-items:center;font-size:13px}
 .hb-l{color:var(--sky-ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;gap:6px;align-items:center}
 .hb-t{height:10px;background:var(--sky);border-radius:999px;overflow:hidden}.hb-f{display:block;height:100%;border-radius:999px}
 .hb-r{color:var(--sky-muted);font-family:var(--f-mono);font-size:12px;text-align:right;white-space:nowrap}
 @media (max-width:640px){.hb{grid-template-columns:1fr auto}.hb-t{grid-column:1/-1;order:3}}
+
+:root[data-theme="light"] .tpill{color:color-mix(in srgb,var(--c) 52%,#000);background:color-mix(in srgb,var(--c) 14%,transparent)}:root[data-theme="light"] .legend{color:var(--sky-muted)}
+@media (prefers-color-scheme: light){:root:not([data-theme]) .tpill{color:color-mix(in srgb,var(--c) 52%,#000);background:color-mix(in srgb,var(--c) 14%,transparent)}}
 .tpill{display:inline-block;font-size:10.5px;font-family:var(--f-mono);letter-spacing:.04em;text-transform:uppercase;border:1px solid var(--c);color:var(--c);border-radius:999px;padding:0 7px;line-height:17px;white-space:nowrap}
 .linkish{background:none;border:0;padding:0;color:var(--sky-ink);cursor:pointer;text-align:left;font:inherit}
 .linkish:hover{text-decoration:underline}
@@ -574,7 +579,7 @@ body.resopen{overflow:hidden}
 .ydep{stroke:rgba(10,15,30,.55);stroke-width:.35px;cursor:pointer;opacity:.9}
 .msite{stroke-width:1.6px;cursor:pointer}
 .lg-dia{border-radius:50%!important;box-shadow:0 0 0 2px var(--sky) inset}
-.mdot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:-1px;border:1px solid rgba(255,255,255,.25)}
+.mdot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:-1px;border:1px solid var(--sky-line)}
 .minchips{margin:6px 0 8px}
 .ficha{margin:4px 0 8px}.ficha .fsum{font-size:15px;line-height:1.5;margin:0 0 10px}
 .fsec{margin:10px 0;padding-top:8px;border-top:1px solid var(--line,rgba(255,255,255,.08))}.fsec p{margin:4px 0;line-height:1.5}
@@ -1222,7 +1227,8 @@ setInterval(pollReports,120000);
 setInterval(()=>{if(!document.hidden)refreshTimes()},60000);
 /* configuración del historial */
 function uiTheme(){return store.get("radar-uitheme")||"dark"}
-function setUiTheme(t){store.set("radar-uitheme",t);if(t==="system")document.documentElement.removeAttribute("data-theme");else document.documentElement.setAttribute("data-theme",t);syncThemeBtns();document.querySelectorAll('input[name="uitheme"]').forEach(i=>i.checked=i.value===t)}
+function setUiTheme(t){store.set("radar-uitheme",t);if(t==="system")document.documentElement.removeAttribute("data-theme");else document.documentElement.setAttribute("data-theme",t);syncThemeBtns();document.querySelectorAll('input[name="uitheme"]').forEach(i=>i.checked=i.value===t);if(view!=="lista")renderViz()}
+try{matchMedia("(prefers-color-scheme: light)").addEventListener("change",()=>{if(uiTheme()==="system"&&view!=="lista")renderViz()})}catch(_){}
 function syncThemeBtns(){const t=uiTheme();document.querySelectorAll("[data-uitheme]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.uitheme===t))}
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-uitheme]");if(b)setUiTheme(b.dataset.uitheme)});syncThemeBtns();
 document.addEventListener("change",e=>{if(e.target&&e.target.name==="uitheme")setUiTheme(e.target.value)});
@@ -2652,6 +2658,9 @@ var satOn=store.get("radar-sats"); if(satOn==null)satOn=true;
 var satUse=store.get("radar-satuse")||"", satQ="";
 var N2ISO={"242": "FJI", "834": "TZA", "732": "ESH", "124": "CAN", "840": "USA", "398": "KAZ", "860": "UZB", "598": "PNG", "360": "IDN", "032": "ARG", "152": "CHL", "180": "COD", "706": "SOM", "404": "KEN", "729": "SDN", "148": "TCD", "332": "HTI", "214": "DOM", "643": "RUS", "044": "BHS", "238": "FLK", "578": "NOR", "304": "GRL", "260": "ATF", "626": "TLS", "710": "ZAF", "426": "LSO", "484": "MEX", "858": "URY", "076": "BRA", "068": "BOL", "604": "PER", "170": "COL", "591": "PAN", "188": "CRI", "558": "NIC", "340": "HND", "222": "SLV", "320": "GTM", "084": "BLZ", "862": "VEN", "328": "GUY", "740": "SUR", "250": "FRA", "218": "ECU", "630": "PRI", "388": "JAM", "192": "CUB", "716": "ZWE", "072": "BWA", "516": "NAM", "686": "SEN", "466": "MLI", "478": "MRT", "204": "BEN", "562": "NER", "566": "NGA", "120": "CMR", "768": "TGO", "288": "GHA", "384": "CIV", "324": "GIN", "624": "GNB", "430": "LBR", "694": "SLE", "854": "BFA", "140": "CAF", "178": "COG", "266": "GAB", "226": "GNQ", "894": "ZMB", "454": "MWI", "508": "MOZ", "748": "SWZ", "024": "AGO", "108": "BDI", "376": "ISR", "422": "LBN", "450": "MDG", "275": "PSE", "270": "GMB", "788": "TUN", "012": "DZA", "400": "JOR", "784": "ARE", "634": "QAT", "414": "KWT", "368": "IRQ", "512": "OMN", "548": "VUT", "116": "KHM", "764": "THA", "418": "LAO", "104": "MMR", "704": "VNM", "408": "PRK", "410": "KOR", "496": "MNG", "356": "IND", "050": "BGD", "064": "BTN", "524": "NPL", "586": "PAK", "004": "AFG", "762": "TJK", "417": "KGZ", "795": "TKM", "364": "IRN", "760": "SYR", "051": "ARM", "752": "SWE", "112": "BLR", "804": "UKR", "616": "POL", "040": "AUT", "348": "HUN", "498": "MDA", "642": "ROU", "440": "LTU", "428": "LVA", "233": "EST", "276": "DEU", "100": "BGR", "300": "GRC", "792": "TUR", "008": "ALB", "191": "HRV", "756": "CHE", "442": "LUX", "056": "BEL", "528": "NLD", "620": "PRT", "724": "ESP", "372": "IRL", "540": "NCL", "090": "SLB", "554": "NZL", "036": "AUS", "144": "LKA", "156": "CHN", "158": "TWN", "380": "ITA", "208": "DNK", "826": "GBR", "352": "ISL", "031": "AZE", "268": "GEO", "608": "PHL", "458": "MYS", "096": "BRN", "705": "SVN", "246": "FIN", "703": "SVK", "203": "CZE", "232": "ERI", "392": "JPN", "600": "PRY", "887": "YEM", "682": "SAU", "010": "ATA", "196": "CYP", "504": "MAR", "818": "EGY", "434": "LBY", "231": "ETH", "262": "DJI", "800": "UGA", "646": "RWA", "070": "BIH", "807": "MKD", "688": "SRB", "499": "MNE", "780": "TTO", "728": "SSD"};
 var SATCOL={"Comunicaciones (internet satelital)":"#5CC8FF","Comunicaciones":"#7FD8BE","Navegación":"#F2B84B","Observación de la Tierra":"#9BE15D","Meteorología":"#B39DFF","Ciencia":"#E879A6","Militar":"#FF5D5D","Tecnología":"#FFB4A2","Otros":"#93A0BA","Sin datos":"#5B6780"};
+var SATCOL_D=SATCOL, SATCOL_L={"Comunicaciones (internet satelital)":"#0B6FA8","Comunicaciones":"#0E7C66","Navegación":"#A86400","Observación de la Tierra":"#3F7F12","Meteorología":"#6A4FC4","Ciencia":"#B4246A","Militar":"#C62828","Tecnología":"#B5532F","Otros":"#4B5567","Sin datos":"#7A8597"};
+function gLight(){const v=getComputedStyle(document.documentElement).getPropertyValue("--sky").trim().toUpperCase();return v.indexOf("#F")===0}
+function satPal(){return gLight()?SATCOL_L:SATCOL_D}
 function satCat(s){const p=s.pu||"";if(!p)return"Sin datos";
   if(/internet satelital/.test(p))return"Comunicaciones (internet satelital)";
   if(/^Comunicaciones/.test(p))return"Comunicaciones";if(/Navegaci/.test(p))return"Navegación";
@@ -2684,7 +2693,7 @@ function globeHTML(){
   BASE_LAYERS.filter(L=>isOn(L.id)&&layerAvail(L)&&L.id!=="geo"&&L.id!=="dep").forEach(L=>legend.push('<span><i style="background:'+L.col+'"></i>'+esc(L.label)+"</span>"));
   if(isOn("geo"))legend.push('<span><i class="lg-geo"></i>Intensidad geopolítica</span>');
   if(isOn("dep"))legend.push('<span><i style="background:rgba(255,122,92,.85)"></i>Dependencia: 1 cable</span><span><i style="background:rgba(79,209,165,.95)"></i>20 o más</span>');
-  if(satOn)legend.push(Object.keys(SATCOL).map(k=>'<span><i style="background:'+SATCOL[k]+'"></i>'+esc(k)+"</span>").join(""));
+  if(satOn)legend.push(Object.keys(SATCOL).map(k=>'<span><i style="background:'+satPal()[k]+'"></i>'+esc(k)+"</span>").join(""));
   const srcs=mapSources();
   return '<div class="vhead"><div><div class="label">Mapa mundial · globo 3D</div><h3>'+esc(satOn?"Capas y satélites en órbita":mapTitle())+'</h3></div>'+
     '<div class="vctl">'+mapModeHTML()+'<button class="btn sky-btn" data-layers aria-expanded="'+layerPanel+'">'+ICON.layers+" Capas <b>"+(activeLayerNames().length+(satOn?1:0))+"</b></button></div></div>"+
@@ -2706,7 +2715,7 @@ function satPanelHTML(){
   F.forEach(s=>{const o=s.op||"Sin datos de operador";ops[o]=(ops[o]||0)+1;const w=s.ow||"Sin datos";own[w]=(own[w]||0)+1});
   const top=(o,n)=>Object.entries(o).sort((a,b)=>b[1]-a[1]).slice(0,n);const mx=Math.max(1,...top(ops,1).map(x=>x[1]));
   h+='<p class="note"><b>'+F.length.toLocaleString("es-CO")+"</b> de "+satD.sats.length.toLocaleString("es-CO")+" satélites activos"+(satUse||satQ?" con este filtro":"")+". Posiciones calculadas en tu navegador con los elementos orbitales más recientes ("+esc(satEpoch())+").</p>"+
-    '<div class="satchips"><button class="gchip'+(!satUse?" on":"")+'" data-satuse="">Todos</button>'+Object.keys(SATCOL).filter(k=>cnt[k]).map(k=>'<button class="gchip'+(satUse===k?" on":"")+'" data-satuse="'+esc(k)+'"><i style="background:'+SATCOL[k]+'"></i>'+esc(k)+" · "+cnt[k].toLocaleString("es-CO")+"</button>").join("")+"</div>"+
+    '<div class="satchips"><button class="gchip'+(!satUse?" on":"")+'" data-satuse="">Todos</button>'+Object.keys(SATCOL).filter(k=>cnt[k]).map(k=>'<button class="gchip'+(satUse===k?" on":"")+'" data-satuse="'+esc(k)+'"><i style="background:'+satPal()[k]+'"></i>'+esc(k)+" · "+cnt[k].toLocaleString("es-CO")+"</button>").join("")+"</div>"+
     '<label class="label" for="satq">Buscar por nombre, empresa o país</label><input id="satq" class="satq" type="search" placeholder="Ej.: Starlink, Colombia, Kuiper, GPS" value="'+esc(satQ)+'">'+
     '<div class="label">¿De quién son? Operadores con más satélites</div><div class="satbars">'+top(ops,10).map(([o,n])=>'<button class="satbar" data-satop="'+esc(o)+'" title="Filtrar por '+esc(o)+'"><span>'+esc(o)+'</span><i style="width:'+(n/mx*100).toFixed(1)+'%"></i><b>'+n.toLocaleString("es-CO")+"</b></button>").join("")+"</div>"+
     '<div class="label">Países u organizaciones dueñas</div><p class="note">'+top(own,8).map(([o,n])=>esc(o)+" "+n.toLocaleString("es-CO")).join(" · ")+"</p>";
@@ -2766,13 +2775,15 @@ function globeMount(){const slot=$("#globe-slot");if(!slot)return;
   }).catch(()=>{const s=$("#globe-slot");if(s)s.innerHTML='<p class="note" style="padding:20px">No se pudo cargar el globo 3D en este navegador. Usa la vista plana.</p>'})}
 function globeSize(){if(!G3)return;const r=G3.host.parentNode&&G3.host.parentNode.getBoundingClientRect();if(!r||!r.width)return;G3.gl.width(r.width).height(Math.max(360,r.height))}
 function globeData(){if(!G3)return;const gl=G3.gl;const ts=visibleTopics();
-  const sig=JSON.stringify([layerOn,mapSel,current&&current.id,ts.length,customLayers.length,typeof minFilter!=="undefined"?minFilter:0]);
+  const LT=gLight();const sig=JSON.stringify([LT,layerOn,mapSel,current&&current.id,ts.length,customLayers.length,typeof minFilter!=="undefined"?minFilter:0]);
   if(sig!==G3sig){G3sig=sig;
     const LL=iso=>{const p=WORLD.pts[iso];if(!p)return null;const [lo,la]=invLL(p[0],p[1]);return {lat:la,lng:lo}};
     const byIso=globeByIso(), GS=isOn("geo")?geoStats(ts):null, gmax=GS?Math.max(1,...Object.values(GS).map(s=>s.score)):1, DC=isOn("dep")&&resHas("cm")?depCounts():{};
-    gl.polygonStrokeColor(f=>f.iso===mapSel?"#FFFFFF":"rgba(147,160,186,.35)");
+    try{gl.globeMaterial().color.set(LT?"#E4ECF6":"#0E1A33")}catch(_){}gl.atmosphereColor(LT?"#8FB3E0":"#5CC8FF");
+    gl.labelColor(()=>LT?"#111827":"#FFFFFF");
+    gl.polygonStrokeColor(f=>f.iso===mapSel?(LT?"#111827":"#FFFFFF"):(LT?"rgba(75,85,103,.35)":"rgba(147,160,186,.35)"));
     gl.polygonCapColor(f=>{const g=GS&&GS[f.iso];if(f.iso===mapSel)return"rgba(140,156,255,.55)";if(g)return geoColor(g.score,gmax);const dn=DC[f.iso];if(dn)return depColor(dn);
-      const l=byIso[f.iso];if(l)return "rgba(255,122,92,"+(0.10+Math.max(...l.map(x=>x.t.heat||1))*0.05).toFixed(2)+")";return "rgba(36,50,79,.92)"});
+      const l=byIso[f.iso];if(l)return "rgba(255,122,92,"+(0.10+Math.max(...l.map(x=>x.t.heat||1))*0.05).toFixed(2)+")";return LT?"rgba(205,215,229,.95)":"rgba(36,50,79,.92)"});
     const pts=[],paths=[],arcs=[],labels=[];
     Object.keys(byIso).forEach(iso=>{const q=LL(iso);if(!q)return;const l=byIso[iso];pts.push({lat:q.lat,lng:q.lng,c:"#FF7A5C",a:0.01+Math.min(l.length,12)*0.012,r:0.35,t:WORLD.pts[iso][2]+" · "+l.length+" tema(s)",iso})});
     if(isOn("news"))ts.forEach((t,ti)=>{const g=(t.geo||[]).filter(x=>WORLD.pts[x.iso]);if(g.length<2)return;const a=LL(g[0].iso);g.slice(1).forEach(x=>{const b=LL(x.iso);if(a&&b)arcs.push({a0:a.lat,o0:a.lng,a1:b.lat,o1:b.lng,c:["rgba(255,122,92,.6)","rgba(255,122,92,.12)"]})})});
@@ -2788,11 +2799,11 @@ function globeData(){if(!G3)return;const gl=G3.gl;const ts=visibleTopics();
     gl.pointsData(pts).pathsData(paths).arcsData(arcs).labelsData(labels)}
   globeSats()}
 function globeSats(){if(!G3)return;if(!satOn||!satD||!satPos){G3.gl.particlesData([]);return}
-  const F=new Set(satFiltered().map(s=>s.n)), groups={};
-  satD.sats.forEach((s,i)=>{const p=satPos[i];if(!p||!F.has(s.n))return;(groups[s._c]=groups[s._c]||[]).push({lat:p.lat,lng:p.lng,alt:p.h/6371,s,i,c:SATCOL[s._c]})});
-  const data=Object.keys(groups).map(k=>{const a=groups[k];a.c=SATCOL[k];return a});
-  if(satPickI!=null&&satPos[satPickI]){const p=satPos[satPickI],s=satD.sats[satPickI];const a=[{lat:p.lat,lng:p.lng,alt:p.h/6371,s,i:satPickI,c:"#FFFFFF"}];a.c="#FFFFFF";data.push(a)}
-  G3.gl.particlesColor(a=>a.c).particlesSize(a=>a.c==="#FFFFFF"?6:1.6).particlesData(data)}
+  const F=new Set(satFiltered().map(s=>s.n)), groups={}, PAL=satPal(), HI=gLight()?"#111827":"#FFFFFF";
+  satD.sats.forEach((s,i)=>{const p=satPos[i];if(!p||!F.has(s.n))return;(groups[s._c]=groups[s._c]||[]).push({lat:p.lat,lng:p.lng,alt:p.h/6371,s,i,c:PAL[s._c]})});
+  const data=Object.keys(groups).map(k=>{const a=groups[k];a.c=PAL[k];return a});
+  if(satPickI!=null&&satPos[satPickI]){const p=satPos[satPickI],s=satD.sats[satPickI];const a=[{lat:p.lat,lng:p.lng,alt:p.h/6371,s,i:satPickI,c:HI}];a.c=HI;a.big=1;data.push(a)}
+  G3.gl.particlesColor(a=>a.c).particlesSize(a=>a.big?6:1.8).particlesData(data)}
 
 /* ----- clics propios ----- */
 function globeClick(e){
