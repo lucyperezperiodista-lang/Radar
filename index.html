@@ -536,6 +536,9 @@ body.resopen{overflow:hidden}
 .icard .note{color:var(--sky-muted)}.icard .warnline{color:#F2C46B}
 .icard .satq{background:var(--sky);color:var(--sky-ink);border-color:var(--sky-line)}.icard .satq::placeholder{color:var(--sky-muted)}
 .icard .gchip{color:var(--sky-ink)}
+.globesky .legend{position:absolute;left:10px;top:10px;right:64px;z-index:2;border:1px solid var(--sky-line);border-radius:8px;background:rgba(11,18,34,.86);color:#C9D2E3;max-width:640px}
+.globesky .gstatus{top:auto;bottom:10px}
+.satrow .sw{flex:none}.sw .track{background:#5B6780}
 .vinfo,.icard,.lpanel{color:var(--sky-ink)}
 .vinfo .note,.vinfo .label,.icard .label,.lpanel .note,.lpanel .label,.lpanel small{color:var(--sky-muted)}
 .vinfo a,.lpanel a{color:#9FB0FF}
@@ -611,8 +614,8 @@ body.resopen{overflow:hidden}
 .edph{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px;align-items:center}.edph span{display:flex;flex-wrap:wrap;gap:4px}
 .edrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.edrow label{display:flex;gap:6px;align-items:center;font-size:13px}.edrow input[type=range]{width:110px}
 .edcolors{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
-.sw{width:24px;height:24px;border-radius:6px;border:1px solid rgba(127,127,127,.5);cursor:pointer;padding:0;color:inherit;font-size:12px;background:transparent}
-.sw.on{outline:2px solid var(--accent,#8C9CFF);outline-offset:2px}.edcolors input[type=color]{width:30px;height:26px;border:0;background:none;padding:0}
+button.sw{width:24px;height:24px;border-radius:6px;border:1px solid rgba(127,127,127,.5);cursor:pointer;padding:0;color:inherit;font-size:12px;background:transparent}
+button.sw.on{outline:2px solid var(--accent,#8C9CFF);outline-offset:2px}.edcolors input[type=color]{width:30px;height:26px;border:0;background:none;padding:0}
 .edlayers{margin:0;padding-left:20px;max-height:260px;overflow:auto}.edlayers li{margin:2px 0}
 .igthumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
 .igthumb{display:grid;gap:4px;background:none;border:1px solid var(--line,rgba(255,255,255,.12));border-radius:10px;padding:6px;color:inherit;font:inherit;font-size:12px;cursor:pointer}
@@ -2750,7 +2753,7 @@ function globeMount(){const slot=$("#globe-slot");if(!slot)return;
       .pathPoints("p").pathPointLat(x=>x[0]).pathPointLng(x=>x[1]).pathColor("c").pathStroke(0.6).pathLabel(p=>'<div class="gtip">'+esc(p.t)+"</div>").pathTransitionDuration(0)
       .onPathClick(p=>{mapPick=p.k;mapSel=null;renderViz()})
       .arcStartLat("a0").arcStartLng("o0").arcEndLat("a1").arcEndLng("o1").arcColor("c").arcStroke(0.5).arcAltitudeAutoScale(0.35).arcDashLength(0.5).arcDashGap(0.2).arcDashAnimateTime(4000)
-      .labelLat("lat").labelLng("lng").labelText("t").labelSize(0.55).labelDotRadius(0.28).labelColor(()=>"rgba(255,255,255,.95)").labelResolution(2).labelAltitude(0.01)
+      .labelLat("lat").labelLng("lng").labelText("t").labelSize(1.15).labelDotRadius(0.35).labelColor(()=>"#FFFFFF").labelResolution(3).labelAltitude(0.02)
       .onLabelClick(l=>{mapPick=l.k;mapSel=null;renderViz()})
       .particleLat("lat").particleLng("lng").particleAltitude("alt").particlesSize(1.6).particlesSizeAttenuation(false).particlesColor(d=>d.c)
       .particleLabel(d=>'<div class="gtip">'+esc(d.s.nm)+"<br><small>"+esc(d.s.op||d.s._c)+"</small></div>")
@@ -2769,10 +2772,10 @@ function globeData(){if(!G3)return;const gl=G3.gl;const ts=visibleTopics();
     const byIso=globeByIso(), GS=isOn("geo")?geoStats(ts):null, gmax=GS?Math.max(1,...Object.values(GS).map(s=>s.score)):1, DC=isOn("dep")&&resHas("cm")?depCounts():{};
     gl.polygonStrokeColor(f=>f.iso===mapSel?"#FFFFFF":"rgba(147,160,186,.35)");
     gl.polygonCapColor(f=>{const g=GS&&GS[f.iso];if(f.iso===mapSel)return"rgba(140,156,255,.55)";if(g)return geoColor(g.score,gmax);const dn=DC[f.iso];if(dn)return depColor(dn);
-      const l=byIso[f.iso];if(l)return "rgba(255,122,92,"+(0.16+Math.max(...l.map(x=>x.t.heat||1))*0.07).toFixed(2)+")";return "rgba(36,50,79,.92)"});
+      const l=byIso[f.iso];if(l)return "rgba(255,122,92,"+(0.10+Math.max(...l.map(x=>x.t.heat||1))*0.05).toFixed(2)+")";return "rgba(36,50,79,.92)"});
     const pts=[],paths=[],arcs=[],labels=[];
-    Object.keys(byIso).forEach(iso=>{const q=LL(iso);if(!q)return;const l=byIso[iso];pts.push({lat:q.lat,lng:q.lng,c:"#FF7A5C",a:0.02+l.length*0.025,r:0.45,t:WORLD.pts[iso][2]+" · "+l.length+" tema(s)",iso})});
-    if(isOn("news"))ts.forEach((t,ti)=>{const g=(t.geo||[]).filter(x=>WORLD.pts[x.iso]);if(g.length<2)return;const a=LL(g[0].iso);g.slice(1).forEach(x=>{const b=LL(x.iso);if(a&&b)arcs.push({a0:a.lat,o0:a.lng,a1:b.lat,o1:b.lng,c:["rgba(255,122,92,.9)","rgba(255,122,92,.2)"]})})});
+    Object.keys(byIso).forEach(iso=>{const q=LL(iso);if(!q)return;const l=byIso[iso];pts.push({lat:q.lat,lng:q.lng,c:"#FF7A5C",a:0.01+Math.min(l.length,12)*0.012,r:0.35,t:WORLD.pts[iso][2]+" · "+l.length+" tema(s)",iso})});
+    if(isOn("news"))ts.forEach((t,ti)=>{const g=(t.geo||[]).filter(x=>WORLD.pts[x.iso]);if(g.length<2)return;const a=LL(g[0].iso);g.slice(1).forEach(x=>{const b=LL(x.iso);if(a&&b)arcs.push({a0:a.lat,o0:a.lng,a1:b.lat,o1:b.lng,c:["rgba(255,122,92,.6)","rgba(255,122,92,.12)"]})})});
     if(isOn("cables")&&infraHas("cables")){if(!G3.cab)G3.cab=INFRA.cables.map((c,i)=>pathLL(c[2]).map(p=>({p,c:c[1]||"#5CC8FF",t:c[0],k:"cable:"+i}))).flat();G3.cab.forEach(x=>paths.push(x))}
     const ipt=(kind,col,r)=>{if(isOn(kind)&&infraHas(kind))INFRA[kind].forEach((p,i)=>{const [lo,la]=invLL(p[0],p[1]);pts.push({lat:la,lng:lo,c:col,a:0.006,r,t:p[2],k:kind+":"+i})})};
     ipt("landing","#7FD8BE",0.12);ipt("dc","#F2B84B",0.16);ipt("ixp","#E879A6",0.14);
