@@ -2853,7 +2853,11 @@ function srcA(u,t){return u?'<a href="'+esc(u)+'" target="_blank" rel="noopener"
 function hbars(rows,opt){opt=opt||{};const mx=Math.max(1,...rows.map(r=>+r.v||0));
   return '<div class="hbars'+(opt.cls?" "+opt.cls:"")+'" role="list">'+rows.map(r=>'<div class="hb" role="listitem" title="'+esc(r.l+": "+(opt.fmt||usd)(r.v)+(r.note?" · "+r.note:""))+'"><span class="hb-l">'+esc(r.l)+(r.note?" *":"")+'</span><span class="hb-t"><i style="width:'+Math.max(0.6,(r.v/mx*100)).toFixed(2)+"%;background:"+(r.c||"var(--accent,#FF7A5C)")+'"></i></span><b class="hb-v">'+(opt.fmt||usdS)(r.v)+"</b></div>").join("")+"</div>"}
 
-var podN=store.get("radar-podn")||10, podCont=store.get("radar-podcont")||"latam", podSec="", podOwn="", podPick=null, pibCont=store.get("radar-pibcont")||"";
+var podN=store.get("radar-podn")||10, podConts=store.get("radar-podconts")||["latam"], podCtry=store.get("radar-podctry")||[], podSecs=store.get("radar-podsecs")||[], podOwns=store.get("radar-podowns")||[], podPick=null, pibCont=store.get("radar-pibcont")||"";
+function secOK(r){return !podSecs.length||podSecs.some(s=>s==="tech"?TECHIND.includes(r.industry):secOf(r)===s)}
+function ownOK(r){return !podOwns.length||podOwns.includes((emp(r)||{}).ownership||"sin")}
+function podCountries(){const W=PW();if(!W)return[];const set=new Map();W.countries.forEach(c=>{if(podConts.some(g=>g==="world"||(g==="latam"?c.latam:c.continent===g))||podCtry.includes(c.iso3))set.set(c.iso3,c)});return [...set.values()]}
+function togArr(a,v){const i=a.indexOf(v);if(i>=0)a.splice(i,1);else a.push(v);return a}
 var SEC={"Banking":"Banca","Diversified Financials":"Servicios financieros","Insurance":"Seguros","Oil & Gas Operations":"Petróleo y gas","IT Software & Services":"Tecnología: software e internet","Semiconductors":"Tecnología: semiconductores","Technology Hardware & Equipment":"Tecnología: hardware","Telecommunications Services":"Telecomunicaciones","Drugs & Biotechnology":"Farmacéutica y biotecnología","Consumer Durables":"Automotriz y bienes durables","Retailing":"Comercio minorista","Retail and Wholesale":"Comercio minorista y electrónico","Food, Drink & Tobacco":"Alimentos, bebidas y tabaco","Business Services & Supplies":"Servicios empresariales","Media":"Medios y entretenimiento","Household & Personal Products":"Consumo y cuidado personal","Capital Goods":"Industria y bienes de capital","Aerospace & Defense":"Aeroespacial y defensa","Trading Companies":"Comercio y conglomerados","Health Care Equipment & Services":"Salud: servicios y equipos","Conglomerates":"Conglomerados"};
 function secOf(r){return SEC[r.industry]||r.industry}
 var TECHIND=["IT Software & Services","Semiconductors","Technology Hardware & Equipment"];
@@ -2867,7 +2871,7 @@ function contChips(cur,attr,withAll){const W=PW();const cnt={};(W?W.countries:[]
   return '<div class="satchips">'+(withAll?'<button class="gchip'+(!cur?" on":"")+'" data-'+attr+'="">Todo el mundo · '+(W?W.countries.length:0)+"</button>":"")+'<button class="gchip'+(cur==="latam"?" on":"")+'" data-'+attr+'="latam">América Latina · 20</button>'+CONTS.map(c=>'<button class="gchip'+(cur===c?" on":"")+'" data-'+attr+'="'+esc(c)+'">'+esc(c)+" · "+(cnt[c]||0)+"</button>").join("")+"</div>"}
 function hbarsC(rows,opt){opt=opt||{};const mx=Math.max(1,...rows.map(r=>+r.v||0));
   return '<div class="hbars'+(opt.cls?" "+opt.cls:"")+'" role="list">'+rows.map(r=>'<button type="button" class="hb hbb" role="listitem" '+(r.pick?'data-podpick="'+esc(r.pick)+'"':"")+' title="'+esc(r.l+": "+usd(r.v)+(r.note?" · "+r.note:"")+" · Toca para ver la ficha")+'"><span class="hb-l">'+(r.tag||"")+esc(r.l)+(r.note?" *":"")+'</span><span class="hb-t"><i style="width:'+Math.max(0.5,(r.v/mx*100)).toFixed(2)+"%;background:"+(r.c||"#FF7A5C")+'"></i></span><b class="hb-v">'+usdS(r.v)+"</b></button>").join("")+"</div>"}
-function podCos(){const F=FB();return F.top100.filter(r=>(!podSec||(podSec==="tech"?TECHIND.includes(r.industry):secOf(r)===podSec))&&(!podOwn||((emp(r)||{}).ownership===podOwn)))}
+function podCos(){const F=FB();return F.top100.filter(r=>secOK(r)&&ownOK(r))}
 
 function invPoderHTML(){const F=FB(),P=PIB(),W=PW();if(!F||!W)return '<p class="note">Datos en preparación.</p>';
   let h=podPick?podFicha():"";
@@ -2876,17 +2880,19 @@ function invPoderHTML(){const F=FB(),P=PIB(),W=PW();if(!F||!W)return '<p class="
   /* 1. comparación */
   const ML={sales:"ventas",profits:"ganancias",mv:"valor de mercado"};
   const cos=podCos().slice(0,podN);
-  const ctry=pibList(podCont);
+  const ctry=podCountries();
   const rows=ctry.map(c=>({l:c.name,v:c.gdp_busd,c:"#5CC8FF",note:c.year?"dato "+c.year:"",pick:"pa:"+c.iso3})).concat(cos.map(r=>({l:r.company,v:{sales:r.sales_busd,profits:r.profits_busd,mv:r.market_value_busd}[podMetric],c:"#FF7A5C",pick:"co:"+r.rank+"|"+r.company,tag:'<small class="hbrank">#'+r.rank+"</small> "}))).filter(r=>r.v!=null).sort((a,b)=>b.v-a.v);
   const beat=cos.map(r=>({r,n:ctry.filter(c=>c.gdp_busd<({sales:r.sales_busd,profits:r.profits_busd,mv:r.market_value_busd}[podMetric])).length}));
   const secs=[...new Set(F.top100.map(secOf))].sort();
   h+='<section class="icard pod"><div class="label">Comparación · toca una barra para ver su ficha y su análisis tecnopolítico</div><h4>Las empresas más grandes del mundo frente al PIB de los países</h4>'+
     '<div class="podctl"><span class="label">Cuántas empresas</span><div class="seg2">'+[10,20,30,40,50].map(n=>'<button data-podn="'+n+'" aria-pressed="'+(podN===n)+'">'+n+"</button>").join("")+"</div>"+
     '<span class="label">Comparar con su</span><div class="seg2"><button data-podmetric="sales" aria-pressed="'+(podMetric==="sales")+'">Ventas</button><button data-podmetric="profits" aria-pressed="'+(podMetric==="profits")+'">Ganancias</button><button data-podmetric="mv" aria-pressed="'+(podMetric==="mv")+'">Valor de mercado</button></div></div>'+
-    '<div class="podctl"><label class="label" for="podsec">Sector</label><select id="podsec" class="podsel"><option value="">Todos los sectores</option><option value="tech"'+(podSec==="tech"?" selected":"")+'>Solo tecnológicas</option>'+secs.map(x=>'<option'+(podSec===x?" selected":"")+">"+esc(x)+"</option>").join("")+"</select>"+
-    '<label class="label" for="podown">Capital</label><select id="podown" class="podsel"><option value="">Privado, público o mixto</option>'+Object.keys(OWNL).map(k=>'<option value="'+k+'"'+(podOwn===k?" selected":"")+">"+OWNL[k]+"</option>").join("")+"</select></div>"+
-    '<div class="label">Países</div>'+contChips(podCont,"podcont",true)+
-    '<div class="hblegend"><span><i style="background:#5CC8FF"></i>PIB '+W.year+" ("+ctry.length+" países)</span><span><i style=\"background:#FF7A5C\"></i>"+esc(ML[podMetric])+" de "+cos.length+" empresas (Forbes "+esc(F.edition)+")</span></div>"+
+    '<div class="label">Sectores (elige uno o varios)</div><div class="satchips"><button class="gchip'+(!podSecs.length?" on":"")+'" data-podsecs="">Todos</button><button class="gchip'+(podSecs.includes("tech")?" on":"")+'" data-podsecs="tech" aria-pressed="'+podSecs.includes("tech")+'">Todas las tecnológicas</button>'+secs.map(x=>'<button class="gchip'+(podSecs.includes(x)?" on":"")+'" data-podsecs="'+esc(x)+'" aria-pressed="'+podSecs.includes(x)+'">'+esc(x)+" · "+F.top100.filter(r=>secOf(r)===x).length+"</button>").join("")+"</div>"+
+    '<div class="label">Tipo de capital</div><div class="satchips"><button class="gchip'+(!podOwns.length?" on":"")+'" data-podowns="">Todos</button>'+Object.keys(OWNL).map(k=>'<button class="gchip'+(podOwns.includes(k)?" on":"")+'" data-podowns="'+k+'" aria-pressed="'+podOwns.includes(k)+'">'+OWNL[k]+"</button>").join("")+"</div>"+
+    '<div class="label">Países con los que comparar (una o varias regiones, y países sueltos)</div><div class="satchips"><button class="gchip'+(podConts.includes("world")?" on":"")+'" data-podconts="world">Todo el mundo</button><button class="gchip'+(podConts.includes("latam")?" on":"")+'" data-podconts="latam">América Latina</button>'+CONTS.map(c=>'<button class="gchip'+(podConts.includes(c)?" on":"")+'" data-podconts="'+esc(c)+'">'+esc(c)+"</button>").join("")+'<button class="gchip" data-podconts="">Ninguna región</button></div>'+
+    '<div class="podctl"><label class="label" for="podadd">Agregar un país</label><input id="podadd" class="satq podadd" list="podlist" placeholder="Escribe un país y elige de la lista"><datalist id="podlist">'+W.countries.slice().sort((a,b)=>a.name.localeCompare(b.name,"es")).map(c=>'<option value="'+esc(c.name)+'">').join("")+"</datalist>"+
+      podCtry.map(i=>{const c=W.countries.find(x=>x.iso3===i);return c?'<button class="gchip on" data-podrm="'+i+'" title="Quitar">'+esc(c.name)+" ✕</button>":""}).join("")+"</div>"+
+    (!ctry.length?'<p class="note warnline">Elige al menos una región o agrega un país para comparar.</p>':"")+'<div class="hblegend"><span><i style="background:#5CC8FF"></i>PIB '+W.year+" ("+ctry.length+" países)</span><span><i style=\"background:#FF7A5C\"></i>"+esc(ML[podMetric])+" de "+cos.length+" empresas (Forbes "+esc(F.edition)+")</span></div>"+
     (cos.length?'<p class="note"><b>'+beat.filter(b=>b.n>0).length+"</b> de estas "+cos.length+" empresas tienen "+esc(ML[podMetric])+" mayores que el PIB de al menos uno de los "+ctry.length+" países elegidos. La primera de la lista, "+esc(cos[0].company)+", supera el PIB de "+beat[0].n+" de ellos.</p>":"")+
     '<div class="hbscroll">'+hbarsC(rows)+"</div>"+
     '<p class="note warnline">Cómo leer esta comparación: el PIB mide el valor que produce un país en un año; las ventas de una empresa no son valor agregado (incluyen lo que compra a otros) y el valor de mercado es lo que la bolsa paga por ella en un día, no un flujo anual. Sirve para dimensionar el poder económico de las empresas, no para afirmar que «son más grandes que un país».</p>'+
@@ -2904,7 +2910,7 @@ function invPoderHTML(){const F=FB(),P=PIB(),W=PW();if(!F||!W)return '<p class="
       (p?(p.net_income_busd!=null?"<b>"+usd(p.net_income_busd)+"</b>":esc(p.net_income_local||"—"))+"<small>"+esc(p.fiscal_year)+" · "+srcA(p.src,"informe de la empresa")+"</small>":"—")+"</td></tr>"}).join("")+
     '</tbody></table></div><p class="note">* Ventas y ganancias según Forbes: últimos 12 meses a la fecha de corte. La última columna es la ganancia que cada empresa reportó en su año fiscal 2025; Samsung, TSMC, Tencent y SK Hynix reportan en su moneda y no se convirtió a dólares. '+esc(F.method)+'</p><button class="btn" data-resopen="null">📊 Infografía con estos datos</button></section>';
   /* 4. top 100 con sector, dueños y capital */
-  const q=podQ.trim().toLowerCase();let L=F.top100.filter(r=>{const e=emp(r)||{};return (!q||(r.company+" "+secOf(r)+" "+cn2(r.country)+" "+(e.owners||[]).map(o=>o.name).join(" ")).toLowerCase().includes(q))&&(!podSec||(podSec==="tech"?TECHIND.includes(r.industry):secOf(r)===podSec))&&(!podOwn||e.ownership===podOwn)});
+  const q=podQ.trim().toLowerCase();let L=F.top100.filter(r=>{const e=emp(r)||{};return (!q||(r.company+" "+secOf(r)+" "+cn2(r.country)+" "+(e.owners||[]).map(o=>o.name).join(" ")).toLowerCase().includes(q))&&secOK(r)&&ownOK(r)});
   const key={rank:r=>r.rank,sales:r=>-r.sales_busd,profits:r=>-r.profits_busd,mv:r=>-r.market_value_busd,assets:r=>-r.assets_busd,state:r=>-(((emp(r)||{}).state_pct)||0)}[podSort]||(r=>r.rank);L=L.slice().sort((a,b)=>key(a)-key(b)||a.rank-b.rank);
   const th=(k,l)=>'<th scope="col"><button class="linkbtn" data-podsort="'+k+'" aria-pressed="'+(podSort===k)+'">'+l+(podSort===k?" ▼":"")+"</button></th>";
   const oc={};F.top100.forEach(r=>{const t=(emp(r)||{}).ownership||"sin";oc[t]=(oc[t]||0)+1});
@@ -2988,14 +2994,17 @@ function poderClick(e){
   const s=e.target.closest("[data-podsort]");if(s){podSort=s.dataset.podsort;store.set("radar-podsort",podSort);renderViz();return true}
   const m=e.target.closest("[data-podmetric]");if(m){podMetric=m.dataset.podmetric;store.set("radar-podmetric",podMetric);renderViz();return true}
   const n=e.target.closest("[data-podn]");if(n){podN=+n.dataset.podn;store.set("radar-podn",podN);renderViz();return true}
-  const pc=e.target.closest("[data-podcont]");if(pc){podCont=pc.dataset.podcont;store.set("radar-podcont",podCont);renderViz();return true}
+  const pc=e.target.closest("[data-podconts]");if(pc){const v=pc.dataset.podconts;if(!v)podConts=[];else if(v==="world")podConts=podConts.includes("world")?[]:["world"];else{podConts=podConts.filter(x=>x!=="world");togArr(podConts,v)}store.set("radar-podconts",podConts);renderViz();return true}
+  const ps=e.target.closest("[data-podsecs]");if(ps){const v=ps.dataset.podsecs;if(!v)podSecs=[];else togArr(podSecs,v);store.set("radar-podsecs",podSecs);renderViz();return true}
+  const po=e.target.closest("[data-podowns]");if(po){const v=po.dataset.podowns;if(!v)podOwns=[];else togArr(podOwns,v);store.set("radar-podowns",podOwns);renderViz();return true}
+  const pr=e.target.closest("[data-podrm]");if(pr){podCtry=podCtry.filter(x=>x!==pr.dataset.podrm);store.set("radar-podctry",podCtry);renderViz();return true}
   const pb=e.target.closest("[data-pibcont]");if(pb){pibCont=pb.dataset.pibcont;store.set("radar-pibcont",pibCont);renderViz();return true}
   const pk=e.target.closest("[data-podpick]");if(pk){podPick=pk.dataset.podpick;renderViz();const f=$("#podficha");if(f)f.scrollIntoView({behavior:"smooth",block:"start"});return true}
   if(e.target.closest("[data-podclose]")){podPick=null;renderViz();return true}
   const r=e.target.closest("[data-tlreg]");if(r){tlReg=r.dataset.tlreg;store.set("radar-tlreg",tlReg);renderViz();return true}
   const th=e.target.closest("[data-tlth]");if(th){tlTh=th.dataset.tlth;renderViz();return true}
   return false}
-document.addEventListener("change",e=>{if(!e.target)return;if(e.target.id==="podsec"){podSec=e.target.value;renderViz()}else if(e.target.id==="podown"){podOwn=e.target.value;renderViz()}});
+document.addEventListener("change",e=>{if(!e.target||e.target.id!=="podadd")return;const W=PW();const v=e.target.value.trim().toLowerCase();const c=W&&W.countries.find(x=>x.name.toLowerCase()===v);if(c&&!podCtry.includes(c.iso3)){podCtry.push(c.iso3);store.set("radar-podctry",podCtry);renderViz()}});
 var podQT=null;document.addEventListener("input",e=>{if(e.target&&e.target.id==="podq"){podQ=e.target.value;clearTimeout(podQT);podQT=setTimeout(()=>{const pos=e.target.selectionStart;renderViz();const n=$("#podq");if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(_){}}},300)}});
 
 (async function(){
