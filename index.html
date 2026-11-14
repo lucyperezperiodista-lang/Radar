@@ -38,7 +38,7 @@ window.__PUBLIC__=true;
   window.claude={use:function(n){return Promise.resolve(n==="db"?db:null)}};
 })();
 </script>
-<script>document.documentElement.setAttribute("data-theme","dark")</script>
+<script>(function(){var t="dark";try{t=JSON.parse(localStorage.getItem("radar-uitheme")||"null")||"dark"}catch(e){}if(t==="system")document.documentElement.removeAttribute("data-theme");else document.documentElement.setAttribute("data-theme",t==="light"?"light":"dark")})()</script>
 <title>Radar Tecnopolítico</title>
 <meta name="description" content="Radar Tecnopolítico de la Fundación Casa del Bosque: tecnopolítica, IA, desinformación y geopolítica tecnológica, con fuentes verificadas.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1200,9 +1200,13 @@ window.addEventListener("online",wake);
 setInterval(pollReports,120000);
 setInterval(()=>{if(!document.hidden)refreshTimes()},60000);
 /* configuración del historial */
+function uiTheme(){return store.get("radar-uitheme")||"dark"}
+function setUiTheme(t){store.set("radar-uitheme",t);if(t==="system")document.documentElement.removeAttribute("data-theme");else document.documentElement.setAttribute("data-theme",t)}
+document.addEventListener("change",e=>{if(e.target&&e.target.name==="uitheme")setUiTheme(e.target.value)});
 function renderSettings(){
   const p=$("#settings");if(!p)return;
   p.innerHTML='<div class="set-head"><b>Configuración</b><button class="linkbtn" data-closeset>Cerrar</button></div>'+
+    '<fieldset><legend class="label">Apariencia</legend><div class="hist">'+[["light","☀ Clara"],["dark","☾ Oscura"],["system","Según el sistema"]].map(([v,l])=>'<label><input type="radio" name="uitheme" value="'+v+'"'+(uiTheme()===v?" checked":"")+"> "+l+"</label>").join("")+"</div></fieldset>"+
     '<fieldset><legend class="label">Historial visible</legend><div class="hist">'+HIST.map(([d,l])=>'<label><input type="radio" name="hist" id="hist-'+d+'" value="'+d+'"'+(d===histDays?" checked":"")+"> "+l+"</label>").join("")+"</div></fieldset>"+
     '<p class="note">Nada se borra: cada novedad queda guardada en el historial y esto solo cambia cuánto tiempo hacia atrás ves en la lista, el mapa y la galaxia.</p>'+
     '<p class="note">Monitoreo: el radar busca novedades cada hora, de 5:40 a. m. a 10:40 p. m. (hora de Colombia), y solo agrega lo nuevo y verificado.</p>'+
